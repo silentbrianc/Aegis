@@ -1,19 +1,27 @@
 package com.beemdevelopment.aegis.otp;
 
 import android.net.Uri;
+import android.os.Build;
+import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 
+import com.beemdevelopment.aegis.BuildConfig;
 import com.beemdevelopment.aegis.GoogleAuthProtos;
 import com.beemdevelopment.aegis.encoding.Base32;
 import com.beemdevelopment.aegis.encoding.Base64;
 import com.beemdevelopment.aegis.encoding.EncodingException;
 import com.beemdevelopment.aegis.encoding.Hex;
+import com.beemdevelopment.aegis.util.HttpGetString;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,10 +46,14 @@ public class GoogleAuthInfo implements Transferable, Serializable {
         if (uri == null) {
             throw new GoogleAuthInfoException(uri, String.format("Bad URI format: %s", s));
         }
-        return GoogleAuthInfo.parseUri(uri);
+        return GoogleAuthInfo.parseUri(uri, false);
     }
 
     public static GoogleAuthInfo parseUri(Uri uri) throws GoogleAuthInfoException {
+        return parseUri(uri, false);
+    }
+
+    protected static GoogleAuthInfo parseUri(Uri uri, boolean isRecursing) throws GoogleAuthInfoException {
         String scheme = uri.getScheme();
         if (scheme == null || !(scheme.equals(SCHEME) || scheme.equals(MotpInfo.SCHEME))) {
             throw new GoogleAuthInfoException(uri, String.format("Unsupported protocol: %s", scheme));
@@ -52,6 +64,38 @@ public class GoogleAuthInfo implements Transferable, Serializable {
         if (encodedSecret == null) {
             throw new GoogleAuthInfoException(uri, "Parameter 'secret' is not present");
         }
+
+        // Support for TOTP Secure Enrollment, IETF draft
+        // https://datatracker.ietf.org/doc/draft-contario-totp-secure-enrollment
+        //
+        // Check for the secure URL value in the secret and do
+        // a HTTP GET from it to retrieve the "secret" value securely
+        // without ever exposing it to the user.
+        //
+        // We can assume the secret parameter is a URL if it contains "%" or ":".
+        if (encodedSecret.contains("%") || encodedSecret.contains(":"))
+        {
+            if (isRecursing) {
+                throw new GoogleAuthInfoException(uri, "Parameter 'secret' can not have recursive URL");
+            }
+
+            try {
+                 // Now get the original TOTP uri value with the real "secret"
+                StrictMode.ThreadPolicy gfgPolicy =
+                        new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(gfgPolicy);
+                String newUriText = HttpGetString.getStringFromUrlPost(encodedSecret,
+                        getEnrollmentData(),"application/json");
+
+                if (newUriText != null &&  !newUriText.isEmpty()) {
+                    return parseUri(Uri.parse(newUriText), true);
+                }
+            }
+            catch(Exception ignored){
+                throw new GoogleAuthInfoException(uri, "Parameter 'secret' contains invalid URL");
+            }
+        }
+
 
         byte[] secret;
         try {
@@ -158,6 +202,35 @@ public class GoogleAuthInfo implements Transferable, Serializable {
         }
 
         return new GoogleAuthInfo(info, accountName, issuer);
+    }
+
+    public static String getEnrollmentData(){
+        // TOTP Secure Enrollment draft:
+        // https://datatracker.ietf.org/doc/draft-contario-totp-secure-enrollment
+        // specifies for the authenticator app to POST json data with device details
+        // that can be used in the future by admins to help users locate
+        // what authenticator app and device they set up their 2FA on and when.
+        //
+        JSONObject j = new JSONObject();
+        try {
+            j.put("event_type", "totp-secure-enrollment");
+            j.put("time_local", java.time.ZonedDateTime.now(
+                    java.time.ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME));
+            j.put("time_utc", java.time.ZonedDateTime.now(
+                    ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
+            j.put("device_model", Build.MODEL);
+            j.put("device_manufacturer", Build.MANUFACTURER);
+            j.put("os_name","android");
+            j.put("os_version", Build.VERSION.RELEASE);
+            j.put("application_name", "Aegis");
+            j.put("application_version", BuildConfig.VERSION_NAME);
+            // TODO (slientbrianc): Add optional support for getting coarse location data
+            j.put("location_description", "none"); // example: "Cincinnati, Ohio, USA"
+            j.put("location_longitude", "none"); // example: "-84.512"
+            j.put("location_latitude", "none"); // example: "39.103"
+        } catch ( org.json.JSONException e) { }
+
+        return j.toString();
     }
 
     /**
