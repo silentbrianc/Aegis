@@ -13,15 +13,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LayoutAnimationController;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -39,11 +36,8 @@ import com.beemdevelopment.aegis.helpers.MetricsHelper;
 import com.beemdevelopment.aegis.helpers.SimpleItemTouchHelperCallback;
 import com.beemdevelopment.aegis.helpers.UiRefresher;
 import com.beemdevelopment.aegis.otp.TotpInfo;
-import com.beemdevelopment.aegis.ui.dialogs.Dialogs;
 import com.beemdevelopment.aegis.ui.glide.GlideHelper;
 import com.beemdevelopment.aegis.ui.models.ErrorCardInfo;
-import com.beemdevelopment.aegis.ui.models.VaultGroupModel;
-import com.beemdevelopment.aegis.util.UUIDMap;
 import com.beemdevelopment.aegis.vault.VaultEntry;
 import com.beemdevelopment.aegis.vault.VaultGroup;
 import com.bumptech.glide.Glide;
@@ -51,23 +45,17 @@ import com.bumptech.glide.ListPreloader;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.common.base.Strings;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class EntryListView extends Fragment implements EntryAdapter.Listener {
     private EntryAdapter _adapter;
@@ -80,12 +68,9 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
     private ViewPreloadSizeProvider<VaultEntry> _preloadSizeProvider;
     private TotpProgressBar _progressBar;
     private boolean _showProgress;
+    private boolean _showExpirationState;
     private ViewMode _viewMode;
-    private Collection<VaultGroup> _groups;
     private LinearLayout _emptyStateView;
-    private Chip _groupChip;
-    private Set<UUID> _groupFilter;
-    private Set<UUID> _prefGroupFilter;
 
     private UiRefresher _refresher;
 
@@ -106,8 +91,6 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_entry_list_view, container, false);
         _progressBar = view.findViewById(R.id.progressBar);
-        _groupChip = view.findViewById(R.id.chip_group);
-        initializeGroupChip();
 
         // set up the recycler view
         _recyclerView = view.findViewById(R.id.rvKeyProfiles);
@@ -174,40 +157,20 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState == null) {
-            return;
-        }
-
-        HashSet<UUID> filter = (HashSet<UUID>) savedInstanceState.getSerializable("prefGroupFilter");
-        if (filter != null) {
-            _prefGroupFilter = filter;
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // user can apply _groupFilter without saving
-        // restore _groupFilter as _prefGroupFilter in order to reapply correct filter after screen rotate
-        if (_groupFilter != null) {
-            outState.putSerializable("prefGroupFilter", new HashSet<>(_groupFilter));
-        }
-    }
-
-    @Override
     public void onDestroyView() {
         _refresher.destroy();
         super.onDestroyView();
     }
 
+    public void setGroups(Collection<VaultGroup> groups) {
+        _adapter.setGroups(groups);
+        updateDividerDecoration();
+    }
+
     public void setGroupFilter(Set<UUID> groups, boolean animate) {
-        _groupFilter = groups;
         _adapter.setGroupFilter(groups);
         _touchCallback.setIsLongPressDragEnabled(_adapter.isDragAndDropAllowed());
         updateEmptyState();
-        updateGroupChip();
 
         if (animate) {
             runEntriesAnimation();
@@ -220,6 +183,10 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
 
     public void setCopyBehavior(CopyBehavior copyBehavior) {
         _adapter.setCopyBehavior(copyBehavior);
+    }
+
+    public void setSearchBehaviorMask(int searchBehaviorMask) {
+        _adapter.setSearchBehaviorMask(searchBehaviorMask);
     }
 
     public List<VaultEntry> selectAllEntries() {
@@ -380,10 +347,6 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
         }
     }
 
-    public void setPrefGroupFilter(Set<UUID> groupFilter) {
-        _prefGroupFilter = groupFilter;
-    }
-
     public void setCodeGroupSize(Preferences.CodeGrouping codeGrouping) {
         _adapter.setCodeGroupSize(codeGrouping);
     }
@@ -398,6 +361,11 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
 
     public void setShowIcon(boolean showIcon) {
         _adapter.setShowIcon(showIcon);
+    }
+
+    public void setShowExpirationState(boolean showExpirationState) {
+        _showExpirationState = showExpirationState;
+        _adapter.setShowExpirationState(showExpirationState);
     }
 
     public void setHighlightEntry(boolean highlightEntry) {
@@ -515,113 +483,9 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
         _recyclerView.scheduleLayoutAnimation();
     }
 
-    private void addChipTo(ChipGroup chipGroup, VaultGroupModel group) {
-        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_group_filter, null, false);
-        chip.setText(group.getName());
-        chip.setCheckable(true);
-        chip.setChecked(_groupFilter != null && _groupFilter.contains(group.getUUID()));
-        chip.setCheckedIconVisible(true);
-        chip.setOnCheckedChangeListener((group1, checkedId) -> {
-            Set<UUID> groupFilter = getGroupFilter(chipGroup);
-            setGroupFilter(groupFilter, true);
-        });
-        chip.setTag(group);
-        chipGroup.addView(chip);
-    }
-
-    private void initializeGroupChip() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_select_groups, null);
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        NestedScrollView scrollView = view.findViewById(R.id.scrollView);
-        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) scrollView.getLayoutParams();
-        layoutParams.matchConstraintMaxHeight = getResources().getConfiguration().screenHeightDp;
-
-        dialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
-        dialog.getBehavior().setSkipCollapsed(false);
-        dialog.setContentView(view);
-
-        ChipGroup chipGroup = view.findViewById(R.id.groupChipGroup);
-        Button clearButton = view.findViewById(R.id.btnClear);
-        Button saveButton = view.findViewById(R.id.btnSave);
-        clearButton.setOnClickListener(v -> {
-            chipGroup.clearCheck();
-            Set<UUID> groupFilter = Collections.emptySet();
-            if (_listener != null) {
-                _listener.onSaveGroupFilter(groupFilter);
-            }
-            setGroupFilter(groupFilter, true);
-            dialog.dismiss();
-        });
-
-        saveButton.setOnClickListener(v -> {
-            Set<UUID> groupFilter = getGroupFilter(chipGroup);
-            if (_listener != null) {
-                _listener.onSaveGroupFilter(groupFilter);
-            }
-            setGroupFilter(groupFilter, true);
-            dialog.dismiss();
-        });
-
-        _groupChip.setOnClickListener(v -> {
-            chipGroup.removeAllViews();
-
-            for (VaultGroup group : _groups) {
-                addChipTo(chipGroup, new VaultGroupModel(group));
-            }
-            addChipTo(chipGroup, new VaultGroupModel(getString(R.string.no_group)));
-
-            Dialogs.showSecureDialog(dialog);
-        });
-    }
-
-    private static Set<UUID> getGroupFilter(ChipGroup chipGroup) {
-        return chipGroup.getCheckedChipIds().stream()
-                .map(i -> {
-                    Chip chip = chipGroup.findViewById(i);
-                    VaultGroupModel group = (VaultGroupModel) chip.getTag();
-                    return group.getUUID();
-                })
-                .collect(Collectors.toSet());
-    }
-
-    private void updateGroupChip() {
-        if (_groupFilter.isEmpty()) {
-            _groupChip.setText(R.string.groups);
-        } else {
-            _groupChip.setText(String.format("%s (%d)", getString(R.string.groups), _groupFilter.size()));
-        }
-    }
-
     private void setShowProgress(boolean showProgress) {
         _showProgress = showProgress;
         updateDividerDecoration();
-    }
-
-    public void setGroups(Collection<VaultGroup> groups) {
-        _groups = groups;
-        _groupChip.setVisibility(_groups.isEmpty() ? View.GONE : View.VISIBLE);
-        updateDividerDecoration();
-
-        if (_prefGroupFilter != null) {
-            Set<UUID> groupFilter = cleanGroupFilter(_prefGroupFilter);
-            _prefGroupFilter = null;
-            if (!groupFilter.isEmpty()) {
-                setGroupFilter(groupFilter, false);
-            }
-        } else if (_groupFilter != null) {
-            Set<UUID> groupFilter = cleanGroupFilter(_groupFilter);
-            if (!_groupFilter.equals(groupFilter)) {
-                setGroupFilter(groupFilter, true);
-            }
-        }
-    }
-
-    private Set<UUID> cleanGroupFilter(Set<UUID> groupFilter) {
-        Set<UUID> groupUuids = _groups.stream().map(UUIDMap.Value::getUUID).collect(Collectors.toSet());
-
-        return groupFilter.stream()
-                .filter(g -> g == null || groupUuids.contains(g))
-                .collect(Collectors.toSet());
     }
 
     private void updateDividerDecoration() {
@@ -700,8 +564,8 @@ public class EntryListView extends Fragment implements EntryAdapter.Listener {
             }
 
             int entryIndex = _adapter.translateEntryPosToIndex(adapterPosition);
-            // The first entry should have a top margin, but only if the group chip is not shown and the error card is not shown
-            if (entryIndex == 0 && (_groups == null || _groups.isEmpty()) && !_adapter.isErrorCardShown()) {
+            // The first entry should have a top margin, but only if the error card is not shown
+            if (entryIndex == 0 && !_adapter.isErrorCardShown()) {
                 outRect.top = _offset;
             }
 

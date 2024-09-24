@@ -46,7 +46,7 @@
     <string name="pref_account_name_position_title">Rādīt konta nosaukumu</string>
     <string name="pref_shared_issuer_account_name_title">Radīt konta nosaukumu tikai tad, kad nepieciešams</string>
     <string name="pref_shared_issuer_account_name_summary">Rādīt kontu nosaukumu kad vien tiem ir viens un tas pats izdevējs. Citu kontu nosaukums būs paslēpts.</string>
-    <string name="pref_account_name_position_summary_override">Šis iestatījums netiek ņemts vērā mozaīkas skatā. Konta nosaukums vienmēr tiks parādīts zem izdevēja.</string>
+    <string name="pref_account_name_position_summary_override">Šis iestatījums netiek ņemts vērā mozaīkas skatā. Konta nosaukums tiks parādīts zem izdevēja.</string>
     <string name="pref_import_file_title">Ievietot no datnes</string>
     <string name="pref_import_file_summary">Ievietot kodus no datnes</string>
     <string name="pref_android_backups_title">Android mākoņa rezerves kopijas</string>
@@ -63,11 +63,13 @@
     <string name="pref_backups_trigger_title">Veikt dublēšanu</string>
     <string name="pref_backups_trigger_summary">Pašrocīgi veikt dublēšanu</string>
     <string name="pref_backups_versions_title">Paturamo rezerves kopiju skaits</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="zero">Paturēt %1$d rezerves kopijas</item>
         <item quantity="one">Paturēt %1$d rezerves kopiju</item>
         <item quantity="other">Paturēt %1$d rezerves kopijas</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">Paturēt neierobežotu skaitu rezerves kopiju</string>
     <string name="pref_import_app_title">Ievietot no lietotnes</string>
     <string name="pref_import_app_summary">Ievietot kodus no lietotnes (nepieciešama saknes piekļuve)</string>
     <string name="pref_export_title">Izgūt</string>
@@ -104,6 +106,12 @@
     <string name="pref_encryption_summary">Šifrēt glabātavu un atslēgt to ar paroli vai biometriju</string>
     <string name="pref_biometrics_title">Atslēgšana ar biometriju</string>
     <string name="pref_biometrics_summary">Ļaut atslēgt glabātavu ar biometriju</string>
+    <string name="pref_search_behavior_summary">Meklē: %s</string>
+    <string name="pref_search_behavior_prompt">Meklēt jebkurā no zemāk esošajiem laukiem</string>
+    <string name="pref_search_behavior_type_name">Nosaukums</string>
+    <string name="pref_search_behavior_type_issuer">Izsniedzējs</string>
+    <string name="pref_search_behavior_type_note">Piezīme</string>
+    <string name="pref_search_behavior_type_groups">Kopas</string>
     <string name="pref_set_password_title">Mainīt paroli</string>
     <string name="pref_set_password_summary">Uzstādīt jaunu paroli, kas būs nepieciešama, lai atslēgtu glabātavu</string>
     <string name="no_events_title">Nav notikumu</string>
@@ -123,6 +131,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">Glabātavas atslēgšana neizdevās (biometrija)</string>
     <string name="event_description_vault_unlock_failed_biometrics">Mēģinājums atslēgt glabātavu ar biometriju neizdevās</string>
     <string name="event_unknown">Nezināms notikuma veids</string>
+    <string name="audit_log_entry_deleted">(izdzēsts)</string>
     <string name="today_at_time">Šodien %1$s</string>
     <string name="day_of_week_at_time">%1$s %2$s</string>
     <string name="export_encrypted">Šifrēt glabātavu</string>
@@ -209,7 +218,6 @@
     <string name="reading_file">Nolasa datni</string>
     <string name="requesting_root_access">Pieprasa neierobežotu piekļuvi</string>
     <string name="analyzing_qr">Notiek kvadrātkoda nolasīšana</string>
-    <string name="analyzing_qr_multiple">Apstrādā kvadrātkodu %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="zero">Glabātavai pievienoti %d jaunu ierakstu</item>
         <item quantity="one">Glabātavai pievienots %d jauns ieraksts</item>
@@ -303,12 +311,12 @@
     <string name="partial_google_auth_import">Noteikta nepilnīga Google Authenticator izgūšanas datne</string>
     <string name="partial_google_auth_import_warning">Trūkst dažu kvadrātkodu no ievietošanas. Šie kodi netika atrasti:\n\n<b>%s</b>\n\nVar turpināt ievietošanu no šīs nepilnīgās izgūšanas datnes, bet mēs iesakām mēģināt atkārtoti ar visiem kvadrātkodiem, lai nebūtu jāzaudē piekļuve kodiem.</string>
     <string name="missing_qr_code_descriptor">• kvadrātkods %d</string>
-    <string name="import_partial_export_anyway">Vienalga ievietot %d kodus</string>
     <string name="import_google_auth_failure">Neizdevās ievietošana no Google Authenticator izgūšanas datnes</string>
     <string name="unrelated_google_auth_batches_error">Izgūšanas datne satur informāciju par nesaistītu kopumu. Var mēģināt ievietot atsevišķi pa vienam kopumam.</string>
     <string name="no_tokens_can_be_imported">Iznākumā nevar ievietot nevienu kodu</string>
     <string name="unlocking_vault">Atslēgšana ar biometriju</string>
     <string name="rename_group">Pārdēvēt kopu</string>
+    <string name="no_group_selection">Ja ieraksts nav daļa no kādas kopas, to var atrast zem \"Nav kopas\".</string>
     <string name="remove_group">Noņemt kopu</string>
     <string name="remove_group_description">Vai tiešām noņemt šo kopu? Tās ieraksti tiks pārmainīti uz \"Nav kopas\".</string>
     <string name="remove_unused_groups">Izdzēst neizmantotās kopas</string>
@@ -345,6 +353,7 @@
     <string name="pref_minimize_on_copy_title">Samazināt pēc ievietošanas starpliktuvē</string>
     <string name="pref_minimize_on_copy_summary">Samazināt lietotni pēc koda ievietošanas starpliktuvē</string>
     <string name="pref_copy_behavior_title">Ievietot tekstvienības starpliktuvē</string>
+    <string name="pref_search_behavior_title">Meklēšanas uzvedība</string>
     <string name="pref_pause_entry_title">Iesaldēt kodus pēc piesišanas tiem</string>
     <string name="pref_pause_entry_summary">Apturēt kodu atsvaidzināšanu, kad piesit. Kods netiks atjaunots, kamēr vien tas ir izcelts. Ir nepieciešams ieslēgt iestatījumu \"Izcelt kodus, kad piesit\" vai \"Piesist, lai atklātu\".</string>
     <string name="pin_keyboard_description">Jāievada parole, lai iespējotu PIN tastatūru. Jāņem vērā, ka tā darbojas tikai tad, ja parole sastāv tikai no cipariem</string>
@@ -371,7 +380,6 @@
     <string name="unable_to_process_deeplink">Nevar apstrādāt dziļo saiti</string>
     <string name="unable_to_read_qrcode_file">Nav iespējams nolasīt un apstrādāt kvadrātkodu no datnes: %s.</string>
     <string name="unable_to_process_shared_text">Nav iespējams apstrādāt kopīgoto tekstu kā OTP</string>
-    <string name="unable_to_read_qrcode_files">Nav iespējams nolasīt un apstrādāt dažus no kvadrātkodiem. Tikai %d/%d ieraksti tiks ievietoti.</string>
     <string name="unable_to_generate_qrcode">Nav iespējams izveidot kvadrātkodu</string>
     <string name="select_picture">Atlasīt attēlu</string>
     <string name="select_icon">Atlasīt ikonu</string>
@@ -402,17 +410,7 @@
     <string name="time_sync_warning_message">Aegis paļaujas, ka sistēmas laiks sakrīt, lai izveidotu pareizus kodus. Dažu sekunžu nobīde var izraisīt nepareizus kodus. Izskatās, ka šī ierīce nav uzstādīta, lai automātiski sinhronizētu laiku. Vai izdarīt to tagad?</string>
     <string name="time_sync_warning_disable">Nebrīdināt mani. Es zinu, ko es daru.</string>
     <string name="google_qr_export_unrelated">Atrasts nesaistīts kvadrātkods. Jāmēģina pārsāknēt nolasītāju.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="zero">Nolasīti %d/%d kvadrātkodi</item>
-        <item quantity="one">Nolasīts %d/%d kvadrātkods</item>
-        <item quantity="other">Nolasīti %d/%d kvadrātkodi</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">Sagaidāms kvadrātkods #%d, bet tā vietā nolasīts #%d</string>
     <string name="backup_error_bar_message"><b>Glabātavas dublēšana nesen neizdevās</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Nesens rezerves kopijas veidošanas mēģinājums, izmantojot %s, neizdevās, jo atgadījās kļūda. Rezerves kopiju tika mēģināts izveidot %s. Lūgums pārskatīt rezerves kopēšanas iestatījumus, lai pārliecinātos, ka var veiksmīgi veikt rezerves kopiju izveidošanu.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Nesens glabātavas dublēšanas mēģinājums izmantojot %s neizdevās, jo Aegis nebija atļaujas rakstīt rezerves kopijas paredzētajā vietā. Dublēšana tika mēģināta %s. Šī kļūda var atgadīties, ja tika pārvietota vai pāsaukta rezerves kopiju atrašanās vieta vai ja nesen Aegis tika atjaunots no rezerves kopijas. Lūgums atkārtoti iestatī rezerves kopiju atrašanās vietu.
-    </string>
     <string name="backup_system_builtin">Aegis iebūvētā automātisko rezerves kopiju veidošana</string>
     <string name="backup_system_android">Android mākoņa rezerves kopiju sistēma</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        Jaunākā rezerves kopija ir novecojusi (%s)

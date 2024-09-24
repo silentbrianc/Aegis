@@ -44,7 +44,6 @@
     <string name="pref_account_name_position_title">Hesap adını göster</string>
     <string name="pref_shared_issuer_account_name_title">Hesap adını yalnızca gerektiğinde göster</string>
     <string name="pref_shared_issuer_account_name_summary">Hesap adlarını yalnızca aynı sağlayıcıyı paylaştıklarında göster. Diğer hesap adları gizlenecektir.</string>
-    <string name="pref_account_name_position_summary_override">Bu ayar, döşeme görüntüleme modu tarafından geçersiz kılınır. Hesap adı her zaman kartı veren kuruluşun altında gösterilecektir.</string>
     <string name="pref_import_file_title">Dosyadan içeriye aktar</string>
     <string name="pref_import_file_summary">Veritabanını dosyadan içeriye aktar</string>
     <string name="pref_android_backups_title">Android bulut yedekleme</string>
@@ -185,7 +184,6 @@
     <string name="reading_file">Dosya okunuyor</string>
     <string name="requesting_root_access">Root erişimi denetleniyor</string>
     <string name="analyzing_qr">QR kodunu analiz ediliyor</string>
-    <string name="analyzing_qr_multiple">QR kodu %d/%d (%s) analiz ediliyor</string>
     <plurals name="added_new_entries">
         <item quantity="one">Kasaya %d yeni giriş eklendi</item>
         <item quantity="other">Kasaya %d yeni giriş eklendi</item>
@@ -274,7 +272,6 @@
     <string name="partial_google_auth_import">Eksik Google Authenticator dışa aktarımı algılandı</string>
     <string name="partial_google_auth_import_warning">İçe aktarma işleminizde bazı QR kodları eksik. aşağıdaki kodlar bulunamadı:\n\n<b>%s</b>\n\nBu kısmi dışa aktarmayı içe aktarmaya devam edebilirsiniz, ancak herhangi bir tokena erişimi kaybetme riskine girmemek için tüm QR kodlarıyla yeniden denemenizi öneririz.</string>
     <string name="missing_qr_code_descriptor">• QR kodu %d</string>
-    <string name="import_partial_export_anyway">Yine de %d tokenı içe aktar</string>
     <string name="import_google_auth_failure">Dışa aktarılmış Google Authenticator dosyasını içe aktarma işlemi başarısız oldu</string>
     <string name="unrelated_google_auth_batches_error">Dışa aktarma, ilgisiz bir toplu iş için bilgi içerir. Bir seferde 1 partiyi içe aktarmayı deneyin.</string>
     <string name="no_tokens_can_be_imported">Sonuç olarak hiçbir token içe aktarılamaz</string>
@@ -340,7 +337,6 @@
     <string name="unable_to_process_deeplink">Derin bağlantı işlenemiyor</string>
     <string name="unable_to_read_qrcode_file">Dosyadan QR kodu okunamıyor ve işlenemiyor: %s.</string>
     <string name="unable_to_process_shared_text">OTP olarak paylaşılan metin işlenemiyor</string>
-    <string name="unable_to_read_qrcode_files">Bazı QR kodlar okunamıyor ve işlenemiyor. Yalnızca %d/%d girişleri içe aktarılacak.</string>
     <string name="unable_to_generate_qrcode">QR Kodu oluşturulamadı</string>
     <string name="select_picture">Resim seç</string>
     <string name="select_icon">Simge seç</string>
@@ -371,16 +367,7 @@
     <string name="time_sync_warning_message">Aegis doğru kodları oluşturmak üzere sistem zamanın senkron olmasına ihtiyaç duyar. Birkaç saniyelik sapma hatalı kod oluşumuna neden olabilir. Görünüşe göre cihazınız zamanı otomatik senkronize etmeye ayarlanmamış. Şimdi ayarlamak ister misiniz?</string>
     <string name="time_sync_warning_disable">Beni uyarmayı bırak. Ne yaptığımı biliyorum.</string>
     <string name="google_qr_export_unrelated">Alakasız QR kod bulundu. Tarayıcıyı yeniden başlatmayı deneyin.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="one">%d/%d QR kodları tarandı</item>
-        <item quantity="other">%d/%d QR kodları tarandı</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">Beklenen QR kodu #%d idi, ancak bunun yerine #%d tarandı</string>
     <string name="backup_error_bar_message"><b>Kasa yedeklenmesi başarısız oldu</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Bir hata nedeniyle %s ile son kasa yedeği alınamadı. Yedekleme denemesi %s. Yedeklemenin başarılı olması için lütfen yedekleme ayarlarınızı kontrol edin.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Aegis\'in yedekleme konumuna yazma izni olmadığı için %s kullanılarak yapılan yeni bir kasa yedekleme denemesi başarısız oldu. Yedekleme %s olarak denendi. Bu hata, yedekleme konumunu taşıdıysanız/yeniden adlandırdıysanız veya yakın zamanda Aegis\'i bir yedekten geri yüklediyseniz oluşabilir. Lütfen yedekleme konumunu yeniden yapılandırın.
-    </string>
     <string name="backup_system_builtin">Aegis dahili otomatik yedekleri</string>
     <string name="backup_system_android">Android\'in bulut yedekleme sistemi</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        Son yedek güncel değil (%s)

@@ -32,6 +32,7 @@ import com.beemdevelopment.aegis.otp.TotpInfo;
 import com.beemdevelopment.aegis.ui.models.ErrorCardInfo;
 import com.beemdevelopment.aegis.util.CollectionUtils;
 import com.beemdevelopment.aegis.vault.VaultEntry;
+import com.beemdevelopment.aegis.vault.VaultGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +52,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<VaultEntry> _entries;
     private List<VaultEntry> _shownEntries;
     private List<VaultEntry> _selectedEntries;
+    private Collection<VaultGroup> _groups;
     private Map<UUID, Integer> _usageCounts;
     private Map<UUID, Long> _lastUsedTimestamps;
     private VaultEntry _focusedEntry;
@@ -58,12 +60,14 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Preferences.CodeGrouping _codeGroupSize;
     private AccountNamePosition _accountNamePosition;
     private boolean _showIcon;
+    private boolean _showExpirationState;
     private boolean _onlyShowNecessaryAccountNames;
     private boolean _highlightEntry;
     private boolean _tempHighlightEntry;
     private boolean _tapToReveal;
     private int _tapToRevealTime;
     private CopyBehavior _copyBehavior;
+    private int _searchBehaviorMask;
     private Set<UUID> _groupFilter;
     private SortCategory _sortCategory;
     private ViewMode _viewMode;
@@ -112,6 +116,10 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         _showIcon = showIcon;
     }
 
+    public void setShowExpirationState(boolean showExpirationState) {
+        _showExpirationState = showExpirationState;
+    }
+
     public void setTapToReveal(boolean tapToReveal) {
         _tapToReveal = tapToReveal;
     }
@@ -129,6 +137,8 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void setCopyBehavior(CopyBehavior copyBehavior) { _copyBehavior = copyBehavior; }
+
+    public void setSearchBehaviorMask(int searchBehaviorMask) { _searchBehaviorMask = searchBehaviorMask; }
 
     public void setPauseFocused(boolean pauseFocused) {
         _pauseFocused = pauseFocused;
@@ -308,6 +318,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Set<UUID> groups = entry.getGroups();
         String issuer = entry.getIssuer().toLowerCase();
         String name = entry.getName().toLowerCase();
+        String note = entry.getNote().toLowerCase();
 
         if (!_groupFilter.isEmpty()) {
             if (groups.isEmpty() && !_groupFilter.contains(null)) {
@@ -322,7 +333,17 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return false;
         }
 
-        return !issuer.contains(_searchFilter) && !name.contains(_searchFilter);
+        return ((_searchBehaviorMask & Preferences.SEARCH_IN_ISSUER) == 0 || !issuer.contains(_searchFilter))
+                && ((_searchBehaviorMask & Preferences.SEARCH_IN_NAME) == 0 || !name.contains(_searchFilter))
+                && ((_searchBehaviorMask & Preferences.SEARCH_IN_NOTE) == 0 || !note.contains(_searchFilter))
+                && ((_searchBehaviorMask & Preferences.SEARCH_IN_GROUPS) == 0 || !doesAnyGroupMatchSearchFilter(entry.getGroups(), _searchFilter));
+    }
+
+    private boolean doesAnyGroupMatchSearchFilter(Set<UUID> entryGroupUUIDs, String searchFilter) {
+        return _groups.stream()
+                .filter(group -> entryGroupUUIDs.contains(group.getUUID()))
+                .map(VaultGroup::getName)
+                .anyMatch(groupName -> groupName.toLowerCase().contains(searchFilter.toLowerCase()));
     }
 
     public void refresh(boolean hard) {
@@ -362,7 +383,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void setSearchFilter(String search) {
-        _searchFilter = (search != null && !search.isEmpty()) ? search.toLowerCase() : null;
+        _searchFilter = (search != null && !search.isEmpty()) ? search.toLowerCase().trim() : null;
         updateShownEntries();
     }
 
@@ -410,6 +431,8 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void setUsageCounts(Map<UUID, Integer> usageCounts) { _usageCounts = usageCounts; }
 
     public Map<UUID, Integer> getUsageCounts() { return _usageCounts; }
+
+    public void setGroups(Collection<VaultGroup> groups) { _groups = groups; }
 
     public void setLastUsedTimestamps(Map<UUID, Long> lastUsedTimestamps) { _lastUsedTimestamps = lastUsedTimestamps; }
 
@@ -521,7 +544,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
 
             AccountNamePosition accountNamePosition = showAccountName ? _accountNamePosition : AccountNamePosition.HIDDEN;
-            entryHolder.setData(entry, _codeGroupSize, _viewMode, accountNamePosition, _showIcon, showProgress, hidden, paused, dimmed);
+            entryHolder.setData(entry, _codeGroupSize, _viewMode, accountNamePosition, _showIcon, showProgress, hidden, paused, dimmed, _showExpirationState);
             entryHolder.setFocused(_selectedEntries.contains(entry));
             entryHolder.setShowDragHandle(isEntryDraggable(entry));
 
@@ -538,11 +561,11 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         if (_highlightEntry || _tempHighlightEntry || _tapToReveal) {
                             if (_focusedEntry == entry) {
                                 resetFocus();
-
-                                // Prevent copying when singletap is set and focus is reset
-                                handled = _copyBehavior == CopyBehavior.SINGLETAP;
                             } else {
                                 focusEntry(entry, _tapToRevealTime);
+
+                                // Prevent copying when singletap is set and the entry is being revealed
+                                handled = _copyBehavior == CopyBehavior.SINGLETAP && _tapToReveal;
                             }
                         }
 
@@ -550,7 +573,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             case SINGLETAP:
                                 if (!handled) {
                                     _view.onEntryCopy(entry);
-                                    entryHolder.animateCopyText(_viewMode != ViewMode.TILES);
+                                    entryHolder.animateCopyText();
                                     _clickedEntry = null;
                                 }
                                 break;
@@ -559,7 +582,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                                 if(entry == _clickedEntry) {
                                     _view.onEntryCopy(entry);
-                                    entryHolder.animateCopyText(_viewMode != ViewMode.TILES);
+                                    entryHolder.animateCopyText();
                                     _clickedEntry = null;
                                 } else {
                                     _clickedEntry = entry;

@@ -46,7 +46,6 @@
     <string name="pref_account_name_position_title">اضهِر اسم الحساب</string>
     <string name="pref_shared_issuer_account_name_title">اضهِر اسم الحساب فقط عند الضرورة</string>
     <string name="pref_shared_issuer_account_name_summary">أضهِر أسماء الحسابات فقط عندما يشتركون نفس المصدر. سيتم إخفاء أسماء الحسابات الأخرى.</string>
-    <string name="pref_account_name_position_summary_override">تجاوز هذا الإعداد عن طريق وضع عرض البلاط. سيتم عرض اسم الحساب دائمًا أسفل المصدر.</string>
     <string name="pref_import_file_title">استيراد من ملف</string>
     <string name="pref_import_file_summary">استيراد الرموز من ملف</string>
     <string name="pref_android_backups_title">النسخ الاحتياطية السحابية للأندرويد</string>
@@ -63,6 +62,7 @@
     <string name="pref_backups_trigger_title">اصنع نسخة احتياطية</string>
     <string name="pref_backups_trigger_summary">قم بعمل نسخة احتياطية يدويًّا</string>
     <string name="pref_backups_versions_title">عدد الإصدارات المراد الاحتفاظ بها</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="zero">احتفظ ب%1$d إصدارات من النسخ الاحتياطية</item>
         <item quantity="one">احتفظ بإصدار واحد من النسخ الاحتياطية</item>
@@ -71,6 +71,7 @@
         <item quantity="many">احتفظ ب%1$d إصدارات من النسخ الاحتياطية</item>
         <item quantity="other">احتفظ ب%1$d إصدارات من النسخ الاحتياطية</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">الاحتفاظ بعدد غير محدود من النُسخ الاحتياطية</string>
     <string name="pref_import_app_title">استيراد من تطبيق</string>
     <string name="pref_import_app_summary">استيراد الرموز من تطبيق (يتطلب الوصول إلى الجذر root)</string>
     <string name="pref_export_title">تصدير</string>
@@ -218,7 +219,6 @@
     <string name="reading_file">قراءة الملف</string>
     <string name="requesting_root_access">طلب صلاحية الجذر</string>
     <string name="analyzing_qr">تحليل رمز QR</string>
-    <string name="analyzing_qr_multiple">تحليل رمز QR %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="zero">تم إضافة %d مدخل جديد إلى المخزن</item>
         <item quantity="one">تم إضافة %d مدخل جديد إلى المخزن</item>
@@ -327,14 +327,14 @@
     <string name="partial_google_auth_import">اكتُشف تصدير Google Authenticator غير مكتمل</string>
     <string name="partial_google_auth_import_warning">بعض رموز QR مفقودة من الاستيراد. لم يتم العثور على الرموز التالية:\n\n<b>%s</b>\n\nيمكنك الاستمرار في استيراد هذا التصدير الجزئي ولكننا نوصي بإعادة المحاولة باستخدام جميع رموز QR حتى لا تخاطر بفقدان الوصول إلى أي رموز.</string>
     <string name="missing_qr_code_descriptor">• رمز QR %d</string>
-    <string name="import_partial_export_anyway">استيراد %d رموز على أي حال</string>
     <string name="import_google_auth_failure">فشل استيراد تصدير Google Authenticator</string>
     <string name="unrelated_google_auth_batches_error">يحتوي التصدير على معلومات عن دُفعة غير ذات صلة. حاول استيراد دفعة واحدة في كل مرة.</string>
     <string name="no_tokens_can_be_imported">نتيجة لذلك، لا يمكن استيراد أي رموز</string>
     <string name="unlocking_vault">يتم فتح قفل المخزن</string>
     <string name="rename_group">إعادة تسمية المجموعة</string>
+    <string name="no_group_selection">إذا لم يكن الإدخال جزءا من أي مجموعة، يمكن العثور عليه تحت \"بلا مجموعة\".</string>
     <string name="remove_group">إزالة المجموعة</string>
-    <string name="remove_group_description">هل ترغب حقًا في إزالة هذه المجموعة؟ ستتحول المدخلات في هذه المجموعة تلقائيًا إلى &quot;غير مجمّعة&quot;</string>
+    <string name="remove_group_description">هل ترغب حقًا في إزالة هذه المجموعة؟ ستتحول المدخلات في هذه المجموعة تلقائيًا إلى \'بلا مجموعة\'.</string>
     <string name="remove_unused_groups">حذف المجموعات غير المستخدمة</string>
     <string name="remove_unused_groups_description">هل أنت متأكد من أنك تريد حذف جميع المجموعات التي لم يتم تعيينها إلى إدخال؟</string>
     <string name="remove_icon_pack">حذف حزمة الأيقونات</string>
@@ -398,7 +398,6 @@
     <string name="unable_to_process_deeplink">تعذرت معالجة الارتباط العميق</string>
     <string name="unable_to_read_qrcode_file">غير قادر على قراءة ومعالجة رمز QR من الملف: %s.</string>
     <string name="unable_to_process_shared_text">غير قادر على معالجة النص المُشارك ك OTP</string>
-    <string name="unable_to_read_qrcode_files">غير قادر على قراءة ومعالجة بعض رموز QR. سيتم استيراد %d/%d فقط من المدخلات.</string>
     <string name="unable_to_generate_qrcode">تعذّر توليد كود QR</string>
     <string name="select_picture">اختر صورة</string>
     <string name="select_icon">اختر أيقونة</string>
@@ -429,19 +428,7 @@
     <string name="time_sync_warning_message">يعتمد Aegis على وقت النظام لتوليد الأكواد الصحيحة. انحراف بمقادر بضعة ثواني يمكن أن يؤدي إلى أكواد خاطئة. يبدوا أن جهازك غير معيّن إلى مزامنة الوقت تلقائيًا. هل ترغب بفعل ذلك الآن؟</string>
     <string name="time_sync_warning_disable">إيقاف تحذيري. أنا أعرف ما أفعله.</string>
     <string name="google_qr_export_unrelated">تم العثور على كود QR لا علاقة له. حاول إعادة تشغيل الماسح.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="zero">تم مسح %d/%d رمز QR</item>
-        <item quantity="one">تم مسح %d/%d رمز QR</item>
-        <item quantity="two">تم مسح %d/%d رموز QR</item>
-        <item quantity="few">تم مسح %d/%d رموز QR</item>
-        <item quantity="many">تم مسح %d/%d رمز QR</item>
-        <item quantity="other">تم مسح %d/%d رمز QR</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">انتظرت كود QR #%d، ولكن مسحت #%d بدلًا منه</string>
     <string name="backup_error_bar_message"><b>النسخ الاحتياطي للمخزن فشل مؤخرًا</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">         فشلت محاولة النسخ الاحتياطي للمخزون باستخدام %s بسبب حدوث خطأ. تمت محاولة النسخ الاحتياطي %s. الرجاء التحقق من إعدادات النسخ الاحتياطي للتأكد من أن النسخ الاحتياطي يمكن أن يكتمل بنجاح.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">فشلت محاولة النسخ الاحتياطي الأخيرة للمحفظة باستخدام %s لأن Aegis لم يكن لديه الإذن قراءة وجهة النسخ الاحتياطي. تمت محاولة النسخ الاحتياطي %s. يمكن أن يحدث هذا الخطأ إذا قمت بنقل/إعادة تسمية وجهة النسخ الاحتياطي أو إذا قمت للتو باستعادة Aegis من نسخة احتياطية. الرجاء إعادة إعداد وجهة النسخ الإحتياطي.    </string>
     <string name="backup_system_builtin">النسخ الاحتياطية التلقائية المضنة في Aegis</string>
     <string name="backup_system_android">نظام النسخ الاحتياطي السحابي للأندرويد</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        أحدث نسخة احتياطية قديمة (%s)

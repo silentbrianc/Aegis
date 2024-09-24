@@ -46,7 +46,7 @@
     <string name="pref_account_name_position_title">Показывать имя учётной записи</string>
     <string name="pref_shared_issuer_account_name_title">Показывать имя учётной записи только при необходимости</string>
     <string name="pref_shared_issuer_account_name_summary">Показывать названия учётных записей только в случае, если у них один эмитент. Названия других учётных записей не будут отображаться.</string>
-    <string name="pref_account_name_position_summary_override">Эта настройка переопределяется плиточным режимом просмотра. Название учётной записи всегда будет отображаться под эмитентом.</string>
+    <string name="pref_account_name_position_summary_override">Эта настройка переопределяется плиточным режимом просмотра. Название учётной записи будет отображаться под эмитентом.</string>
     <string name="pref_import_file_title">Импорт из файла</string>
     <string name="pref_import_file_summary">Импорт ключей из файла</string>
     <string name="pref_android_backups_title">Облачное резервирование Android</string>
@@ -63,12 +63,14 @@
     <string name="pref_backups_trigger_title">Создать резервную копию</string>
     <string name="pref_backups_trigger_summary">Создание резервной копии вручную</string>
     <string name="pref_backups_versions_title">Количество хранимых версий</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="one">Хранить %1$d версию резервной копии</item>
         <item quantity="few">Хранить %1$d версии резервной копии</item>
         <item quantity="many">Хранить %1$d версий резервной копии</item>
         <item quantity="other">Хранить %1$d версий резервной копии</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">Не ограничивать количество версий резервных копий</string>
     <string name="pref_import_app_title">Импорт из приложения</string>
     <string name="pref_import_app_summary">Импорт ключей из другого приложения (требуются права суперпользователя)</string>
     <string name="pref_export_title">Экспорт в файл</string>
@@ -106,6 +108,12 @@
     <string name="pref_encryption_summary">Шифровать хранилище и разблокировать его с помощью пароля или биометрии</string>
     <string name="pref_biometrics_title">Биометрическая разблокировка</string>
     <string name="pref_biometrics_summary">Разрешить биометрическую аутентификацию для разблокировки хранилища</string>
+    <string name="pref_search_behavior_summary">Поиск в: %s</string>
+    <string name="pref_search_behavior_prompt">Поиск в любом из следующих полей</string>
+    <string name="pref_search_behavior_type_name">Имя</string>
+    <string name="pref_search_behavior_type_issuer">Эмитент</string>
+    <string name="pref_search_behavior_type_note">Заметка</string>
+    <string name="pref_search_behavior_type_groups">Группы</string>
     <string name="pref_set_password_title">Изменить пароль</string>
     <string name="pref_set_password_summary">Установить новый пароль, который вам понадобится, чтобы разблокировать хранилище</string>
     <string name="no_events_title">Нет записей о событиях</string>
@@ -125,6 +133,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">Хранилище не разблокировано (биометрия)</string>
     <string name="event_description_vault_unlock_failed_biometrics">Попытка разблокировать хранилище с помощью биометрии завершилась неудачно</string>
     <string name="event_unknown">Неизвестный тип события</string>
+    <string name="audit_log_entry_deleted">(удалено)</string>
     <string name="today_at_time">Сегодня в %1$s</string>
     <string name="day_of_week_at_time">%1$s в %2$s</string>
     <string name="export_encrypted">Шифровать хранилище</string>
@@ -212,7 +221,6 @@
     <string name="reading_file">Чтение файла</string>
     <string name="requesting_root_access">Запрос root-доступа</string>
     <string name="analyzing_qr">Анализ QR-кода</string>
-    <string name="analyzing_qr_multiple">Анализ QR-кода %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="one">Добавлена %d новая запись в хранилище</item>
         <item quantity="few">Добавлены %d новые записи в хранилище</item>
@@ -311,12 +319,12 @@
     <string name="partial_google_auth_import">Обнаружен неполный экспорт Google Authenticator</string>
     <string name="partial_google_auth_import_warning">Некоторые QR-коды отсутствуют в импорте. Следующие коды не найдены:\n\n<b>%s</b>\n\nВы можете продолжить импорт этого неполного экспорта, но лучше сделать повторный экспорт со всеми QR-кодами, чтобы избежать риска потери доступа к ключам.</string>
     <string name="missing_qr_code_descriptor">• QR-код %d</string>
-    <string name="import_partial_export_anyway">Принудительно импортировать %d ключей</string>
     <string name="import_google_auth_failure">Невожможно импортировать экспорт из Google Authenticator</string>
     <string name="unrelated_google_auth_batches_error">Экспорт содержит информацию для несвязанного пакета. Попробуйте импортировать по 1 пакету за раз.</string>
     <string name="no_tokens_can_be_imported">В результате ни один ключ не может быть импортирован</string>
     <string name="unlocking_vault">Разблокировка хранилища</string>
     <string name="rename_group">Переименовать группу</string>
+    <string name="no_group_selection">Если запись не входит ни в одну группу, её можно найти в разделе «Нет группы».</string>
     <string name="remove_group">Удалить группу</string>
     <string name="remove_group_description">Удалить группу? Записи из этой группы будут автоматически перемещены в «Нет группы».</string>
     <string name="remove_unused_groups">Удалить неиспользуемые группы</string>
@@ -353,6 +361,7 @@
     <string name="pref_minimize_on_copy_title">Сворачивать при копировании</string>
     <string name="pref_minimize_on_copy_summary">Сворачивать приложение после копирования ключа</string>
     <string name="pref_copy_behavior_title">Копировать ключи в буфер обмена</string>
+    <string name="pref_search_behavior_title">Поведение поиска</string>
     <string name="pref_pause_entry_title">Замораживать ключи при нажатии</string>
     <string name="pref_pause_entry_summary">Приостановить автоматическое обновление ключей принажатии на них. Ключи не будут обновляться до тех пор, пока отображаются. Для обновления потребуется «Выделять ключи при нажатии» или «Отображение по нажатию».</string>
     <string name="pin_keyboard_description">Введите свой пароль, чтобы включить PIN-клавиатуру. Обратите внимание, что это работает, только если ваш пароль состоит из цифр.</string>
@@ -380,7 +389,6 @@
     <string name="unable_to_process_deeplink">Невозможно обработать глубокую ссылку</string>
     <string name="unable_to_read_qrcode_file">Невозможно считать и обработать QR-код из файла: %s.</string>
     <string name="unable_to_process_shared_text">Невозможно обработать текст как OTP</string>
-    <string name="unable_to_read_qrcode_files">Невозможно считать и обработать некоторые QR-коды. Импортируется только %d/%d.</string>
     <string name="unable_to_generate_qrcode">Невозможно сгенерировать QR-код</string>
     <string name="select_picture">Выберите изображение</string>
     <string name="select_icon">Выберите значок</string>
@@ -411,18 +419,7 @@
     <string name="time_sync_warning_message">Aegis полагается на системное время для генерации правильных кодов. Отклонение всего в несколько секунд может привести к неверным кодам. Кажется, ваше устройство не настроено для автоматической синхронизации времени. Хотите сделать это сейчас?</string>
     <string name="time_sync_warning_disable">Прекратите меня предупреждать, я знаю, что делаю.</string>
     <string name="google_qr_export_unrelated">Найден несвязанный QR-код. Попробуйте перезапустить сканер.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="one">Отсканировано QR-кодов %d/%d</item>
-        <item quantity="few">Отсканировано QR-кодов %d/%d</item>
-        <item quantity="many">Отсканировано QR-кодов %d/%d</item>
-        <item quantity="other">Отсканировано QR-кодов %d/%d</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">Ожидался QR-код #%d, но вместо этого отсканирован #%d</string>
     <string name="backup_error_bar_message"><b>Недавно произошла ошибка резервного копирования хранилища</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">Последнее резервное копирование хранилища с использованием %s не выполнено из-за ошибки. Попытка производилась %s. Убедитесь, что настройки резервного копирования правильные.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Недавняя попытка резервного копирования хранилища с использованием %s не выполнена, поскольку у Aegis нет разрешения на запись в место назначения резервной копии. Попытка создания резервной копии была %s. Эта ошибка может возникать, если вы переместили/переименовали место назначения резервной копии или если недавно восстановили параметры Aegis из резервной копии. Пожалуйста, перенастройте место назначения резервной копии.
-    </string>
     <string name="backup_system_builtin">Встроенное автоматическое резервирование Aegis</string>
     <string name="backup_system_android">Системное облачное резервирование Android</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        Резервная копия устарела (%s)

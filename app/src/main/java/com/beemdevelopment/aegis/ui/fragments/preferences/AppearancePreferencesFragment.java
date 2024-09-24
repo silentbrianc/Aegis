@@ -77,7 +77,7 @@ public class AppearancePreferencesFragment extends PreferencesFragment {
         });
 
         Preference langPreference = requirePreference("pref_lang");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             String[] langs = getResources().getStringArray(R.array.pref_lang_values);
             String[] langNames = getResources().getStringArray(R.array.pref_lang_entries);
             List<String> langList = Arrays.asList(langs);
@@ -116,7 +116,7 @@ public class AppearancePreferencesFragment extends PreferencesFragment {
                         int i = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                         _prefs.setCurrentViewMode(ViewMode.fromInteger(i));
                         viewModePreference.setSummary(String.format("%s: %s", getString(R.string.selected), getResources().getStringArray(R.array.view_mode_titles)[i]));
-                        overrideAccountNamePosition(ViewMode.fromInteger(i) == ViewMode.TILES);
+                        refreshAccountNamePositionText();
                         dialog.dismiss();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
@@ -124,6 +124,11 @@ public class AppearancePreferencesFragment extends PreferencesFragment {
 
             return true;
         });
+
+        Preference showExpirationStatePreference = requirePreference("pref_expiration_state");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            showExpirationStatePreference.setSummary(getString(R.string.pref_expiration_state_fallback));
+        }
 
         String[] codeGroupings = getResources().getStringArray(R.array.pref_code_groupings_values);
         String[] codeGroupingNames = getResources().getStringArray(R.array.pref_code_groupings);
@@ -156,6 +161,7 @@ public class AppearancePreferencesFragment extends PreferencesFragment {
                         int i = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                         _prefs.setAccountNamePosition(AccountNamePosition.fromInteger(i));
                         _currentAccountNamePositionPreference.setSummary(String.format("%s: %s", getString(R.string.selected), getResources().getStringArray(R.array.account_name_position_titles)[i]));
+                        refreshAccountNamePositionText();
                         dialog.dismiss();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
@@ -164,15 +170,15 @@ public class AppearancePreferencesFragment extends PreferencesFragment {
             return true;
         });
 
-        overrideAccountNamePosition(_prefs.getCurrentViewMode() == ViewMode.TILES);
+        refreshAccountNamePositionText();
     }
 
-    private void overrideAccountNamePosition(boolean override) {
+    private void refreshAccountNamePositionText() {
+        boolean override = (_prefs.getCurrentViewMode() == ViewMode.TILES && _prefs.getAccountNamePosition() == AccountNamePosition.END);
+
         if (override) {
-            _currentAccountNamePositionPreference.setEnabled(false);
-            _currentAccountNamePositionPreference.setSummary(getString(R.string.pref_account_name_position_summary_override));
+            _currentAccountNamePositionPreference.setSummary(String.format("%s: %s. %s", getString(R.string.selected), getResources().getStringArray(R.array.account_name_position_titles)[_prefs.getAccountNamePosition().ordinal()], getString(R.string.pref_account_name_position_summary_override)));
         } else {
-            _currentAccountNamePositionPreference.setEnabled(true);
             _currentAccountNamePositionPreference.setSummary(String.format("%s: %s", getString(R.string.selected), getResources().getStringArray(R.array.account_name_position_titles)[_prefs.getAccountNamePosition().ordinal()]));
         }
     }

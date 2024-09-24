@@ -1,7 +1,19 @@
 package com.beemdevelopment.aegis.ui.views;
 
+import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -15,6 +27,7 @@ import com.beemdevelopment.aegis.Preferences;
 import com.beemdevelopment.aegis.R;
 import com.beemdevelopment.aegis.ViewMode;
 import com.beemdevelopment.aegis.helpers.AnimationsHelper;
+import com.beemdevelopment.aegis.helpers.CenterVerticalSpan;
 import com.beemdevelopment.aegis.helpers.SimpleAnimationEndListener;
 import com.beemdevelopment.aegis.helpers.UiRefresher;
 import com.beemdevelopment.aegis.otp.HotpInfo;
@@ -27,6 +40,7 @@ import com.beemdevelopment.aegis.ui.glide.GlideHelper;
 import com.beemdevelopment.aegis.vault.VaultEntry;
 import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
 
 public class EntryHolder extends RecyclerView.ViewHolder {
     private static final float DEFAULT_ALPHA = 1.0f;
@@ -44,7 +58,7 @@ public class EntryHolder extends RecyclerView.ViewHolder {
     private RelativeLayout _description;
     private ImageView _dragHandle;
     private ViewMode _viewMode;
-  
+
     private final ImageView _selected;
     private final Handler _selectedHandler;
 
@@ -59,6 +73,8 @@ public class EntryHolder extends RecyclerView.ViewHolder {
 
     private UiRefresher _refresher;
     private Handler _animationHandler;
+    private AnimatorSet _expirationAnimSet;
+    private boolean _showExpirationState;
 
     private Animation _scaleIn;
     private Animation _scaleOut;
@@ -89,9 +105,7 @@ public class EntryHolder extends RecyclerView.ViewHolder {
         _refresher = new UiRefresher(new UiRefresher.Listener() {
             @Override
             public void onRefresh() {
-                if (!_hidden && !_paused) {
-                    refreshCode();
-                }
+                refreshCode();
             }
 
             @Override
@@ -101,18 +115,23 @@ public class EntryHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    public void setData(VaultEntry entry, Preferences.CodeGrouping groupSize, ViewMode viewMode, AccountNamePosition accountNamePosition, boolean showIcon, boolean showProgress, boolean hidden, boolean paused, boolean dimmed) {
+    public void setData(VaultEntry entry, Preferences.CodeGrouping groupSize, ViewMode viewMode, AccountNamePosition accountNamePosition, boolean showIcon, boolean showProgress, boolean hidden, boolean paused, boolean dimmed, boolean showExpirationState) {
         _entry = entry;
         _hidden = hidden;
         _paused = paused;
         _codeGrouping = groupSize;
         _viewMode = viewMode;
+
         _accountNamePosition = accountNamePosition;
+        if (viewMode.equals(ViewMode.TILES) && _accountNamePosition == AccountNamePosition.END) {
+            _accountNamePosition = AccountNamePosition.BELOW;
+        }
 
         _selected.clearAnimation();
         _selected.setVisibility(View.GONE);
         _selectedHandler.removeCallbacksAndMessages(null);
         _animationHandler.removeCallbacksAndMessages(null);
+        _showExpirationState = _entry.getInfo() instanceof TotpInfo && showExpirationState;
 
         _favoriteIndicator.setVisibility(_entry.isFavorite() ? View.VISIBLE : View.INVISIBLE);
 
@@ -138,20 +157,29 @@ public class EntryHolder extends RecyclerView.ViewHolder {
         }
 
         showIcon(showIcon);
-
         itemView.setAlpha(dimmed ? DIMMED_ALPHA : DEFAULT_ALPHA);
     }
 
     private void setAccountNameLayout(AccountNamePosition accountNamePosition, Boolean hasBothIssuerAndName) {
-        if (_viewMode == ViewMode.TILES) {
-            return;
-        }
-
         RelativeLayout.LayoutParams profileNameLayoutParams;
-        RelativeLayout.LayoutParams copiedLayoutParams;
+
         switch (accountNamePosition) {
             case HIDDEN:
                 _profileName.setVisibility(View.GONE);
+
+                if (_viewMode == ViewMode.TILES) {
+                    _profileCopied.setGravity(Gravity.CENTER_VERTICAL);
+                    ((RelativeLayout.LayoutParams)_profileCopied.getLayoutParams()).removeRule(RelativeLayout.BELOW);
+                    _profileCopied.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    _profileCopied.setTextSize(14);
+
+                    _profileIssuer.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    _profileIssuer.setGravity(Gravity.CENTER_VERTICAL);
+                    _profileIssuer.setTextSize(14);
+
+                    _profileName.setVisibility(View.GONE);
+                }
+
                 break;
 
             case BELOW:
@@ -257,10 +285,15 @@ public class EntryHolder extends RecyclerView.ViewHolder {
     public void refreshCode() {
         if (!_hidden && !_paused) {
             updateCode();
+            startExpirationAnimation();
         }
     }
 
     private void updateCode() {
+        _profileCode.setText(getOtp());
+    }
+
+    private String getOtp() {
         OtpInfo info = _entry.getInfo();
 
         // In previous versions of Aegis, it was possible to import entries with an empty
@@ -277,7 +310,7 @@ public class EntryHolder extends RecyclerView.ViewHolder {
             otp = _view.getResources().getString(R.string.error_all_caps);
         }
 
-        _profileCode.setText(otp);
+        return otp;
     }
 
     private String formatCode(String code) {
@@ -311,14 +344,122 @@ public class EntryHolder extends RecyclerView.ViewHolder {
 
     public void revealCode() {
         updateCode();
+        startExpirationAnimation();
         _hidden = false;
     }
 
     public void hideCode() {
-        String hiddenText = new String(new char[_entry.getInfo().getDigits()]).replace("\0", Character.toString(HIDDEN_CHAR));
-        hiddenText = formatCode(hiddenText);
-        _profileCode.setText(hiddenText);
+        String code = getOtp();
+        String hiddenText = code.replaceAll("\\S", Character.toString(HIDDEN_CHAR));
+        updateTextViewWithDots(_profileCode,  hiddenText, code);
+        stopExpirationAnimation();
         _hidden = true;
+    }
+
+    private void updateTextViewWithDots(TextView textView, String hiddenCode, String code) {
+        Paint paint = new Paint();
+        paint.setTextSize(_profileCode.getTextSize());
+
+        // Calculate the difference between the actual code width and the dots width
+        float codeWidth = paint.measureText(code);
+        float dotsWidth = paint.measureText(hiddenCode);
+        float scaleFactor = codeWidth / dotsWidth;
+        scaleFactor = (float)(Math.round(scaleFactor * 10.0) / 10.0);
+
+        // If scale is higher or equal to 0.8, do nothing and proceed with the normal text rendering
+        if (scaleFactor >= 0.8) {
+            textView.setText(hiddenCode);
+            return;
+        }
+
+        // We need to use an invisible character in order to get the height of the profileCode textview consistent
+        // Tokens without a space (ie Steam TOTP) will get misaligned without this
+        SpannableString dotsString = new SpannableString("\u200B" + hiddenCode);
+
+        // Only scale the digits/characters, skip the spaces
+        int start = 1;
+        for (int i = 0; i <= dotsString.length(); i++) {
+            if (i == dotsString.length() || dotsString.charAt(i) == ' ') {
+                if (i > start) {
+                    dotsString.setSpan(new RelativeSizeSpan(scaleFactor), start, i, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+
+                start = i + 1;
+            }
+        }
+
+        Rect dotsRectBounds = new Rect();
+        paint.getTextBounds(hiddenCode, 1, hiddenCode.length(), dotsRectBounds);
+
+        // Use custom CenterVerticalSpan to make sure the dots are vertically aligned
+        dotsString.setSpan(new CenterVerticalSpan(dotsRectBounds), 1, dotsString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(dotsString);
+    }
+
+    public void startExpirationAnimation() {
+        stopExpirationAnimation();
+        if (!_showExpirationState) {
+            return;
+        }
+
+        final int totalStateDuration = 7000;
+        TotpInfo info = (TotpInfo) _entry.getInfo();
+        if (info.getPeriod() * 1000 < totalStateDuration) {
+            _profileCode.setTextColor(MaterialColors.getColor(_profileCode, com.google.android.material.R.attr.colorError));
+            return;
+        }
+
+        // Workaround for when animations are disabled or Android version being too old
+        float durationScale = AnimationsHelper.Scale.ANIMATOR.getValue(itemView.getContext());
+        if (durationScale == 0.0 || Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            int color = MaterialColors.getColor(_profileCode, com.google.android.material.R.attr.colorError);
+            if (info.getMillisTillNextRotation() < totalStateDuration) {
+                _profileCode.setTextColor(color);
+            } else {
+                _animationHandler.postDelayed(() -> {
+                    _profileCode.setTextColor(color);
+                }, info.getMillisTillNextRotation() - totalStateDuration);
+            }
+
+            return;
+        }
+
+        final int colorShiftDuration = 300;
+        long delayAnimDuration = info.getPeriod() * 1000L - totalStateDuration - colorShiftDuration;
+        ValueAnimator delayAnim = ValueAnimator.ofFloat(0f, 0f);
+        delayAnim.setDuration((long) (delayAnimDuration / durationScale));
+
+        int colorFrom = _profileCode.getCurrentTextColor();
+        int colorTo = MaterialColors.getColor(_profileCode, com.google.android.material.R.attr.colorError);
+        ValueAnimator colorAnim = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnim.setDuration((long) (colorShiftDuration / durationScale));
+        colorAnim.addUpdateListener(a -> _profileCode.setTextColor((int) a.getAnimatedValue()));
+
+        final int blinkDuration = 3000;
+        ValueAnimator delayAnim2 = ValueAnimator.ofFloat(0f, 0f);
+        delayAnim2.setDuration((long) ((totalStateDuration - blinkDuration) / durationScale));
+
+        ObjectAnimator alphaAnim = ObjectAnimator.ofFloat(_profileCode, "alpha", 1f, .5f);
+        alphaAnim.setDuration((long) (500 / durationScale));
+        alphaAnim.setRepeatCount(blinkDuration / 500 - 1);
+        alphaAnim.setRepeatMode(ValueAnimator.REVERSE);
+
+        _expirationAnimSet = new AnimatorSet();
+        _expirationAnimSet.playSequentially(delayAnim, colorAnim, delayAnim2, alphaAnim);
+        _expirationAnimSet.start();
+        long currentPlayTime = (info.getPeriod() * 1000L) - info.getMillisTillNextRotation();
+        _expirationAnimSet.setCurrentPlayTime((long) (currentPlayTime / durationScale));
+    }
+
+    private void stopExpirationAnimation() {
+        if (_expirationAnimSet != null) {
+            _expirationAnimSet.cancel();
+            _expirationAnimSet = null;
+        }
+
+        int colorTo = MaterialColors.getColor(_profileCode, R.attr.colorCode);
+        _profileCode.setTextColor(colorTo);
+        _profileCode.setAlpha(1f);
     }
 
     public void showIcon(boolean show) {
@@ -336,8 +477,11 @@ public class EntryHolder extends RecyclerView.ViewHolder {
     public void setPaused(boolean paused) {
         _paused = paused;
 
-        if (!_hidden && !_paused) {
+        if (_paused) {
+            stopExpirationAnimation();
+        } else if (!_hidden) {
             updateCode();
+            startExpirationAnimation();
         }
     }
 
@@ -349,7 +493,7 @@ public class EntryHolder extends RecyclerView.ViewHolder {
         animateAlphaTo(DEFAULT_ALPHA);
     }
 
-    public void animateCopyText(boolean includeSlideAnimation) {
+    public void animateCopyText() {
         _animationHandler.removeCallbacksAndMessages(null);
 
         Animation slideDownFadeIn = AnimationsHelper.loadScaledAnimation(itemView.getContext(), R.anim.slide_down_fade_in);
@@ -357,23 +501,25 @@ public class EntryHolder extends RecyclerView.ViewHolder {
         Animation fadeOut = AnimationsHelper.loadScaledAnimation(itemView.getContext(), R.anim.fade_out);
         Animation fadeIn = AnimationsHelper.loadScaledAnimation(itemView.getContext(), R.anim.fade_in);
 
-        if (includeSlideAnimation) {
+        // Use slideDown animation when user is not using Tiles mode
+        if (_viewMode != ViewMode.TILES) {
             _profileCopied.startAnimation(slideDownFadeIn);
-           View fadeOutView = (_accountNamePosition == AccountNamePosition.BELOW) ? _profileName : _description;
-
-        fadeOutView.startAnimation(slideDownFadeOut);
+            View fadeOutView = (_accountNamePosition == AccountNamePosition.BELOW) ? _profileName : _description;
+            fadeOutView.startAnimation(slideDownFadeOut);
 
             _animationHandler.postDelayed(() -> {
                 _profileCopied.startAnimation(fadeOut);
                 fadeOutView.startAnimation(fadeIn);
             }, 3000);
         } else {
+            View visibleProfileText = _accountNamePosition == AccountNamePosition.BELOW ? _profileName : _profileIssuer;
+
             _profileCopied.startAnimation(fadeIn);
-            _profileName.startAnimation(fadeOut);
+            visibleProfileText.startAnimation(fadeOut);
 
             _animationHandler.postDelayed(() -> {
                 _profileCopied.startAnimation(fadeOut);
-                _profileName.startAnimation(fadeIn);
+                visibleProfileText.startAnimation(fadeIn);
             }, 3000);
         }
     }

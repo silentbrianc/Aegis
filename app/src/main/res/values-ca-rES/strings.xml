@@ -46,7 +46,7 @@
     <string name="pref_account_name_position_title">Mostra el nom del compte</string>
     <string name="pref_shared_issuer_account_name_title">Mostra el nom del compte només quan sigui necessari</string>
     <string name="pref_shared_issuer_account_name_summary">Mostra el nom de compte només quan es comparteixi el mateix emissor. Altres noms de compte estaran ocults.</string>
-    <string name="pref_account_name_position_summary_override">S\'omet aquesta configuració en usar la visualització en mosaic. Els noms de compte es mostraran sempre a sota de l\'emissor.</string>
+    <string name="pref_account_name_position_summary_override">S\'omet aquesta configuració en usar la visualització en mosaic. Els noms de compte es mostraran a sota de l\'emissor.</string>
     <string name="pref_import_file_title">Importa des d\'un fitxer</string>
     <string name="pref_import_file_summary">Importar fitxes des d\'un fitxer</string>
     <string name="pref_android_backups_title">Copies al núvol d\'Android</string>
@@ -63,10 +63,12 @@
     <string name="pref_backups_trigger_title">Disparador de còpia</string>
     <string name="pref_backups_trigger_summary">Llançar còpia manualment</string>
     <string name="pref_backups_versions_title">Nombre de versions a mantenir</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="one">Mantindre %1$d versions a la còpia</item>
         <item quantity="other">Mantindre %1$d versions a la còpia</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">Mantén un nombre infinit de versions de la còpia de seguretat</string>
     <string name="pref_import_app_title">Importar des d\'app</string>
     <string name="pref_import_app_summary">Importar fitxes des d\'una aplicació (cal root)</string>
     <string name="pref_export_title">Exporta</string>
@@ -102,6 +104,12 @@
     <string name="pref_encryption_summary">Xifra la caixa forta i desbloqueja-la amb contrasenya o biomètrics</string>
     <string name="pref_biometrics_title">Desbloqueig biomètric</string>
     <string name="pref_biometrics_summary">Permet l\'autenticació biomètrica per a desbloquejar la caixa forta</string>
+    <string name="pref_search_behavior_summary">Busca a: %s</string>
+    <string name="pref_search_behavior_prompt">Buscar en qualsevol d\'aquests camps</string>
+    <string name="pref_search_behavior_type_name">Nom</string>
+    <string name="pref_search_behavior_type_issuer">Emissor</string>
+    <string name="pref_search_behavior_type_note">Nota</string>
+    <string name="pref_search_behavior_type_groups">Grups</string>
     <string name="pref_set_password_title">Canvia la contrasenya</string>
     <string name="pref_set_password_summary">Defineix una nova contrasenya per a desbloquejar la caixa forta</string>
     <string name="no_events_title">Cap esdeveniment registrat</string>
@@ -121,6 +129,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">No s\'ha pogut desbloquejar la volta (dades biomètriques)</string>
     <string name="event_description_vault_unlock_failed_biometrics">Hi ha hagut un intent de desbloquejar la volta amb dades biomètriques incorrectes</string>
     <string name="event_unknown">Tipus d\'esdeveniment desconegut</string>
+    <string name="audit_log_entry_deleted">(esborrat)</string>
     <string name="today_at_time">Avui a les %1$s</string>
     <string name="day_of_week_at_time">%1$s a les %2$s</string>
     <string name="export_encrypted">Xifra la caixa forta</string>
@@ -206,7 +215,6 @@
     <string name="reading_file">S\'està llegint el fitxer</string>
     <string name="requesting_root_access">Demanant accés root</string>
     <string name="analyzing_qr">Anàlisi del codi QR</string>
-    <string name="analyzing_qr_multiple">Anàlisi del codi QR %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="one">S\'ha afegit %d entrada nova a la caixa forta</item>
         <item quantity="other">S\'han afegit %d entrades noves a la caixa forta</item>
@@ -295,12 +303,12 @@
     <string name="partial_google_auth_import">S\'ha detectat una exportació incompleta de Google Authenticator</string>
     <string name="partial_google_auth_import_warning">Falten alguns codis QR a la importació. No s\'han trobat els codis següents:\n\n<b>%s</b>\n\nPodeu continuar important aquesta exportació parcial, però us recomanem que torneu a provar amb tots els codis QR perquè no us arriscareu a perdre l\'accés a cap token.</string>
     <string name="missing_qr_code_descriptor">• codi QR %d</string>
-    <string name="import_partial_export_anyway">Importeu %d tokens de totes maneres</string>
     <string name="import_google_auth_failure">No s\'ha pogut importar l\'exportació de Google Authenticator</string>
     <string name="unrelated_google_auth_batches_error">L\'exportació conté informació d\'un lot no relacionat. Proveu d\'importar 1 lot alhora.</string>
     <string name="no_tokens_can_be_imported">Com a resultat, no es poden importar tokens</string>
     <string name="unlocking_vault">Desbloquejant la caixa forta</string>
     <string name="rename_group">Canvia el nom del grup</string>
+    <string name="no_group_selection">Si una entrada no pertany a cap grup, es podrà trobar a \"Sense grup\".</string>
     <string name="remove_group">Elimina el grup</string>
     <string name="remove_group_description">Segur que vols eliminar aquest grup? Les entrades canviaran automàticament a \"Sense grup\".</string>
     <string name="remove_unused_groups">Esborrar grups no utilitzats</string>
@@ -337,6 +345,7 @@
     <string name="pref_minimize_on_copy_title">Minimitzar al copiar</string>
     <string name="pref_minimize_on_copy_summary">Minimitzar l\'aplicació després de copiar una fitxa</string>
     <string name="pref_copy_behavior_title">Copia les fitxes al porta-retalls</string>
+    <string name="pref_search_behavior_title">Comportament de la cerca</string>
     <string name="pref_pause_entry_title">Congela la fitxa al tocar</string>
     <string name="pref_pause_entry_summary">Pausa l\'actualització automàtica de la fitxa al tocar-la. No s\'actualitzará mentre estigui marcada. Cal tenir \"Il·lumina les fitxes al tocar\" o \"Toca per a mostrar\".</string>
     <string name="pin_keyboard_description">Introdueix la teva contrasenya per a activar el teclat PIN. Això només funcionarà si la contrasenya només té dígits</string>
@@ -362,7 +371,6 @@
     <string name="unable_to_process_deeplink">No es pot processar l\'enllaç profund</string>
     <string name="unable_to_read_qrcode_file">No es pot llegir i processar el codi QR del fitxer: %s.</string>
     <string name="unable_to_process_shared_text">No es pot processar el text compartit com a OTP</string>
-    <string name="unable_to_read_qrcode_files">No es poden llegir i processar alguns dels codis QR. Només s\'importaran %d/%d entrades.</string>
     <string name="unable_to_generate_qrcode">La generació del codi QR ha fallat</string>
     <string name="select_picture">Tria imatge</string>
     <string name="select_icon">Tria icona</string>
@@ -393,16 +401,7 @@
     <string name="time_sync_warning_message">Cal que l\'hora del sistema sigui correcta per tal de generar codis correctes. Una desviació d\'uns quants segons pot causar codis no vàlids. Sembla que el teu dispositiu no està configurat per a sincronitzar la hora automàticament. Vols activar-ho ara?</string>
     <string name="time_sync_warning_disable">No cal que m\'avisis més. Sé el que estic fent.</string>
     <string name="google_qr_export_unrelated">Codi QR no vàlid. Prova-ho un altre cop.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="one">S\'ha escanejat %d/%d codi QR</item>
-        <item quantity="other">S\'han escanejat %d/%d codis QR</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">S\'esperava codi QR #%d, però s\'ha trobat #%d en el seu lloc</string>
     <string name="backup_error_bar_message"><b>Ha fallat la còpia de seguretat recentment</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">Una còpia de seguretat de la caixa forta utilitzant %s ha fallat. La còpia s\'ha intentat %s. Si us plau, comprova la configuració de la còpia per a assegurar-te de que les còpies es poden fer correctament.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Un intent recent de còpia de seguretat de la caixa forta utilitzant %s ha fallat perquè l\'Aegis no té permís d\'escriptura en el destí de la còpia de seguretat. La còpia s\'ha intentat %s. Aquest error pot aparèixer si has mogut/reanomenat el destí de la còpia de seguretat o si has restaurat l\'Aegis recentment des d\'una còpia de seguretat. Si us plau torna a configurar el destí de la còpia de seguretat.
-    </string>
     <string name="backup_system_builtin">Còpies de seguretat integrades a Aegis</string>
     <string name="backup_system_android">Còpia al núvol d\'Android</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">L\'última còpia de seguretat és molt antiga (%s)    </string>

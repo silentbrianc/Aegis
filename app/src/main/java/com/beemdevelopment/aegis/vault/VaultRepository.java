@@ -225,6 +225,10 @@ public class VaultRepository {
         _vault.getEntries().add(entry);
     }
 
+    public boolean hasEntryByUUID(UUID uuid) {
+        return _vault.getEntries().has(uuid);
+    }
+
     public VaultEntry getEntryByUUID(UUID uuid) {
         return _vault.getEntries().getByUUID(uuid);
     }
@@ -287,8 +291,11 @@ public class VaultRepository {
         removeGroup(group);
     }
 
-    public void renameGroup(VaultGroup renamedGroup) {
-        _vault.getGroups().replace(renamedGroup);
+    public void replaceGroups(Collection<VaultGroup> groups) {
+        _vault.getGroups().wipe();
+        for (VaultGroup group : groups) {
+            _vault.getGroups().add(group);
+        }
     }
 
     public void removeGroup(VaultGroup group) {

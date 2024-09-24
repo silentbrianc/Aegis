@@ -63,10 +63,12 @@
     <string name="pref_backups_trigger_title">Udløs sikkerhedskopiering</string>
     <string name="pref_backups_trigger_summary">Udløs manuelt en sikkerhedskopiering</string>
     <string name="pref_backups_versions_title">Antal versioner at beholde</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="one">Behold %1$d version af sikkerhedskopien</item>
         <item quantity="other">Behold %1$d versioner af sikkerhedskopien</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">Opbevar et uendeligt antal versioner af sikkerhedskopien</string>
     <string name="pref_import_app_title">Import fra app</string>
     <string name="pref_import_app_summary">Importér tokens fra en app (kræver root-adgang)</string>
     <string name="pref_export_title">Export</string>
@@ -102,6 +104,12 @@
     <string name="pref_encryption_summary">Kryptér og oplås Boksen med adgangskode/biometri</string>
     <string name="pref_biometrics_title">Biometrisk oplåsning</string>
     <string name="pref_biometrics_summary">Tillad biometrisk godkendelse for at oplåse Boksen</string>
+    <string name="pref_search_behavior_summary">Søg gennem: %s</string>
+    <string name="pref_search_behavior_prompt">Søg i ethvert af de flg. felter</string>
+    <string name="pref_search_behavior_type_name">Navn</string>
+    <string name="pref_search_behavior_type_issuer">Udsteder</string>
+    <string name="pref_search_behavior_type_note">Notat</string>
+    <string name="pref_search_behavior_type_groups">Grupper</string>
     <string name="pref_set_password_title">Skift adgangskode</string>
     <string name="pref_set_password_summary">Sæt ny adgangskode til brug for oplåsning af din Boks</string>
     <string name="no_events_title">Ingen rapporterede hændelser</string>
@@ -121,6 +129,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">Boksoplåsning mislykkedes (biometri)</string>
     <string name="event_description_vault_unlock_failed_biometrics">Et boksoplåsningsforsøg med biometri mislykkedes</string>
     <string name="event_unknown">Ukendt hændelsestype</string>
+    <string name="audit_log_entry_deleted">(slettet)</string>
     <string name="today_at_time">I dag kl. %1$s</string>
     <string name="day_of_week_at_time">%1$s kl. %2$s</string>
     <string name="export_encrypted">Kryptér boksen</string>
@@ -206,7 +215,6 @@
     <string name="reading_file">Læser fil</string>
     <string name="requesting_root_access">Anmoder om root-adgang</string>
     <string name="analyzing_qr">Analyserer QR-kode</string>
-    <string name="analyzing_qr_multiple">Analyserer QR-kode %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="one">Tilføjede %d ny post til boksen</item>
         <item quantity="other">Tilføjede %d nye poster til boksen</item>
@@ -295,12 +303,12 @@
     <string name="partial_google_auth_import">Ufuldstændig Google Authenticator-eksport detekteret</string>
     <string name="partial_google_auth_import_warning">Nogle QR-koder mangler i importen. Flg. koder er ikke fundet:\n\n<b>%s</b>\n\nMan kan fortsætte med import af denne delvise eksport, dog anbefales det at prøve igen med alle QR-koderne, så man ikke risikerer at miste adgang til nogle tokens.</string>
     <string name="missing_qr_code_descriptor">• QR-kode %d</string>
-    <string name="import_partial_export_anyway">Importér %d tokens alligevel</string>
     <string name="import_google_auth_failure">Import af Google Authenticator-eksport mislykkedes</string>
     <string name="unrelated_google_auth_batches_error">Eksporten indeholder information om et urelateret sæt. Prøv at importere 1 sæt ad gangen.</string>
     <string name="no_tokens_can_be_imported">Som konsekvens, kan ingen tokener importeres</string>
     <string name="unlocking_vault">Låser boksen op</string>
     <string name="rename_group">Omdøb gruppe</string>
+    <string name="no_group_selection">Er en post ikke en del af en gruppe, kan den findes under \"Ingen gruppe\".</string>
     <string name="remove_group">Fjern gruppe</string>
     <string name="remove_group_description">Sikker på, at denne gruppe skal fjernes? Poster heri vil automatisk skifte til \'Ingen gruppe\'.</string>
     <string name="remove_unused_groups">Slet ubrugte grupper</string>
@@ -337,6 +345,7 @@
     <string name="pref_minimize_on_copy_title">Minimér under kopiering</string>
     <string name="pref_minimize_on_copy_summary">Minimér appen efter kopiering af et token</string>
     <string name="pref_copy_behavior_title">Kopiér tokener til udklipsholder</string>
+    <string name="pref_search_behavior_title">Søgeadfærd</string>
     <string name="pref_pause_entry_title">Frys tokener ved tryk</string>
     <string name="pref_pause_entry_summary">Pausér automatisk opdatering af tokener ved at trykke på dem. Tokener opdateres ikke, så længe de er fokuseret. Kræver \"Fremhæv tokener ved tryk\" eller \"Tryk for at vise\".</string>
     <string name="pin_keyboard_description">Angiv adgangskoden for at aktivere PIN-tastaturet. Bemærk, at dette kun virker, såfremt adgangskoden alene består af cifre</string>
@@ -362,7 +371,6 @@
     <string name="unable_to_process_deeplink">Dybt link kan ikke behandles</string>
     <string name="unable_to_read_qrcode_file">Kan ikke læse og behandle QR-koden fra filen: %s.</string>
     <string name="unable_to_process_shared_text">Kan ikke behandle delt tekst som OTP</string>
-    <string name="unable_to_read_qrcode_files">Kan ikke læse og behandle nogle af QR-koderne. Kun %d/%d poster importeres.</string>
     <string name="unable_to_generate_qrcode">Kan ikke generere QR-kode</string>
     <string name="select_picture">Vælg billede</string>
     <string name="select_icon">Vælg ikon</string>
@@ -393,16 +401,7 @@
     <string name="time_sync_warning_message">Aegis er afhængig af systemtiden for at være i synk til generering af korrekte koder. En afvigelse på kun et par sekunder kan resultere i forkerte koder. Det ser ud til, at enheden ikke er opsat til auto-synk af tid. Opsæt dette nu?</string>
     <string name="time_sync_warning_disable">Ophør med at advare mig. Jeg ved, hvad jeg gør.</string>
     <string name="google_qr_export_unrelated">Ikke-relateret QR-kode fundet. Prøv at genstarte skanneren.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="one">Skannede %d/%d QR-koder</item>
-        <item quantity="other">Skannede %d/%d QR-koder</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">Forventede QR kode #%d, men skannede #%d i stedet</string>
     <string name="backup_error_bar_message"><b>Bokssikkerhedskopiering mislykkedes for nylig</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Et nyligt Bokssikkerhedskopieringsforsøg vha. %s mislykkedes, da en fejl opstod. Sikkerhedskopieringen blev forsøgt: %s. Tjek sikkerhedskopieringsindstillingerne for at sikre, at sikkerhedskopieringer kan fuldføres.
-    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        Et nyligt Bokssikkerhedskopieringsforsøg vha. %s fejlede grundet Aegis\' manglende skriverettighed på sikkerhedskopidestinationen. Sikkerhedskopieringen forsøgt %s. Fejlen kan opstå, hvis sikkerhedskopidestinationen er blevet flyttet/omdøbt, eller Aegis for nylig er gendannet fra en sikkerhedskopi. Genopsæt sikkerhedskopidestination.
-    </string>
     <string name="backup_system_builtin">Aegis\' indbyggede automatiske sikkerhedskopieringer</string>
     <string name="backup_system_android">Android cloud-sikkerhedskopieringssystem</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        Seneste sikkerhedskopi er forældet (%s)

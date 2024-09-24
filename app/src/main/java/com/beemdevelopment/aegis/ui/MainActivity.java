@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
@@ -32,15 +33,18 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.beemdevelopment.aegis.GroupPlaceholderType;
 import com.beemdevelopment.aegis.Preferences;
 import com.beemdevelopment.aegis.R;
 import com.beemdevelopment.aegis.SortCategory;
+import com.beemdevelopment.aegis.helpers.DropdownHelper;
 import com.beemdevelopment.aegis.helpers.FabScrollHelper;
 import com.beemdevelopment.aegis.helpers.PermissionHelper;
 import com.beemdevelopment.aegis.otp.GoogleAuthInfo;
@@ -50,26 +54,37 @@ import com.beemdevelopment.aegis.ui.dialogs.Dialogs;
 import com.beemdevelopment.aegis.ui.fragments.preferences.BackupsPreferencesFragment;
 import com.beemdevelopment.aegis.ui.fragments.preferences.PreferencesFragment;
 import com.beemdevelopment.aegis.ui.models.ErrorCardInfo;
+import com.beemdevelopment.aegis.ui.models.VaultGroupModel;
 import com.beemdevelopment.aegis.ui.tasks.QrDecodeTask;
 import com.beemdevelopment.aegis.ui.views.EntryListView;
 import com.beemdevelopment.aegis.util.TimeUtils;
+import com.beemdevelopment.aegis.util.UUIDMap;
 import com.beemdevelopment.aegis.vault.VaultEntry;
 import com.beemdevelopment.aegis.vault.VaultFile;
+import com.beemdevelopment.aegis.vault.VaultGroup;
 import com.beemdevelopment.aegis.vault.VaultRepository;
 import com.beemdevelopment.aegis.vault.VaultRepositoryException;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AegisActivity implements EntryListView.Listener {
@@ -90,6 +105,11 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
     private Menu _menu;
     private SearchView _searchView;
     private EntryListView _entryListView;
+
+    private Collection<VaultGroup> _groups;
+    private ChipGroup _groupChip;
+    private Set<UUID> _groupFilter;
+    private Set<UUID> _prefGroupFilter;
 
     private FabScrollHelper _fabScrollHelper;
 
@@ -187,6 +207,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
         _entryListView.setCodeGroupSize(_prefs.getCodeGroupSize());
         _entryListView.setAccountNamePosition(_prefs.getAccountNamePosition());
         _entryListView.setShowIcon(_prefs.isIconVisible());
+        _entryListView.setShowExpirationState(_prefs.getShowExpirationState());
         _entryListView.setOnlyShowNecessaryAccountNames(_prefs.onlyShowNecessaryAccountNames());
         _entryListView.setHighlightEntry(_prefs.isEntryHighlightEnabled());
         _entryListView.setPauseFocused(_prefs.isPauseFocusedEnabled());
@@ -195,7 +216,8 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
         _entryListView.setSortCategory(_prefs.getCurrentSortCategory(), false);
         _entryListView.setViewMode(_prefs.getCurrentViewMode());
         _entryListView.setCopyBehavior(_prefs.getCopyBehavior());
-        _entryListView.setPrefGroupFilter(_prefs.getGroupFilter());
+        _entryListView.setSearchBehaviorMask(_prefs.getSearchBehaviorMask());
+        _prefGroupFilter = _prefs.getGroupFilter();
 
          FloatingActionButton fab = findViewById(R.id.fab);
          fab.setOnClickListener(v -> {
@@ -219,8 +241,137 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
              Dialogs.showSecureDialog(dialog);
          });
 
+        _groupChip = findViewById(R.id.groupChipGroup);
         _fabScrollHelper = new FabScrollHelper(fab);
         _selectedEntries = new ArrayList<>();
+    }
+
+    public void setGroups(Collection<VaultGroup> groups) {
+        _groups = groups;
+        _groupChip.setVisibility(_groups.isEmpty() ? View.GONE : View.VISIBLE);
+
+        if (_prefGroupFilter != null) {
+            Set<UUID> groupFilter = cleanGroupFilter(_prefGroupFilter);
+            _prefGroupFilter = null;
+            if (!groupFilter.isEmpty()) {
+                _groupFilter = groupFilter;
+                _entryListView.setGroupFilter(groupFilter, false);
+            }
+        } else if (_groupFilter != null) {
+            Set<UUID> groupFilter = cleanGroupFilter(_groupFilter);
+            if (!_groupFilter.equals(groupFilter)) {
+                _groupFilter = groupFilter;
+                _entryListView.setGroupFilter(groupFilter, true);
+            }
+        }
+
+        _entryListView.setGroups(groups);
+        initializeGroups();
+    }
+
+    private void initializeGroups() {
+        _groupChip.removeAllViews();
+
+        for (VaultGroup group : _groups) {
+            addChipTo(_groupChip, new VaultGroupModel(group));
+        }
+
+        GroupPlaceholderType placeholderType = GroupPlaceholderType.NO_GROUP;
+        addChipTo(_groupChip, new VaultGroupModel(this, placeholderType));
+        addSaveChip(_groupChip);
+    }
+
+    private Set<UUID> cleanGroupFilter(Set<UUID> groupFilter) {
+        Set<UUID> groupUuids = _groups.stream().map(UUIDMap.Value::getUUID).collect(Collectors.toSet());
+
+        return groupFilter.stream()
+                .filter(g -> g == null || groupUuids.contains(g))
+                .collect(Collectors.toSet());
+    }
+
+    private void addChipTo(ChipGroup chipGroup, VaultGroupModel group) {
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_group_filter, null, false);
+        chip.setText(group.getName());
+        chip.setCheckable(true);
+        chip.setCheckedIconVisible(false);
+        chip.setChecked(_groupFilter != null && _groupFilter.contains(group.getUUID()));
+
+        if (group.isPlaceholder()) {
+            GroupPlaceholderType groupPlaceholderType = group.getPlaceholderType();
+            chip.setTag(groupPlaceholderType);
+
+            if (groupPlaceholderType == GroupPlaceholderType.ALL) {
+                chip.setChecked(_groupFilter == null);
+            } else if (groupPlaceholderType == GroupPlaceholderType.NO_GROUP) {
+                chip.setChecked(_groupFilter != null && _groupFilter.contains(null));
+            }
+        } else {
+            chip.setTag(group);
+        }
+
+        chip.setOnCheckedChangeListener((group1, isChecked) -> {
+            Set<UUID> groupFilter = new HashSet<>();
+            setSaveChipVisibility(true);
+
+            if (!isChecked) {
+                group1.setChecked(false);
+                _groupFilter = groupFilter;
+                _entryListView.setGroupFilter(groupFilter, false);
+                return;
+            }
+
+            Object chipTag = group1.getTag();
+            if (chipTag == GroupPlaceholderType.NO_GROUP) {
+                groupFilter.add(null);
+            } else {
+                groupFilter = getGroupFilter(chipGroup);
+            }
+
+            _groupFilter = groupFilter;
+            _entryListView.setGroupFilter(groupFilter, false);
+        });
+
+        chipGroup.addView(chip);
+    }
+
+    private void addSaveChip(ChipGroup chipGroup) {
+        Chip chip = (Chip) getLayoutInflater().inflate(R.layout.chip_group_filter, null, false);
+
+        chip.setText(getString(R.string.save));
+        chip.setVisibility(View.GONE);
+        chip.setChipStrokeWidth(0);
+        chip.setCheckable(false);
+        chip.setChipBackgroundColorResource(android.R.color.transparent);
+        chip.setTextColor(MaterialColors.getColor(chip.getRootView(), com.google.android.material.R.attr.colorSecondary));
+        chip.setClickable(true);
+        chip.setCheckedIconVisible(false);
+        chip.setOnClickListener(v -> {
+            onSaveGroupFilter(_groupFilter);
+            setSaveChipVisibility(false);
+        });
+
+        chipGroup.addView(chip);
+    }
+
+    private void setSaveChipVisibility(boolean visible) {
+        Chip saveChip = (Chip) _groupChip.getChildAt(_groupChip.getChildCount() - 1);
+        saveChip.setChecked(false);
+        saveChip.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private static Set<UUID> getGroupFilter(ChipGroup chipGroup) {
+        return chipGroup.getCheckedChipIds().stream()
+                .map(i -> {
+                    Chip chip = chipGroup.findViewById(i);
+                    if (chip.getTag() instanceof VaultGroupModel) {
+                        VaultGroupModel group = (VaultGroupModel) chip.getTag();
+                        return group.getUUID();
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -251,6 +402,10 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
         instance.putString("submittedSearchQuery", _submittedSearchQuery);
         instance.putBoolean("isDoingIntro", _isDoingIntro);
         instance.putBoolean("isAuthenticating", _isAuthenticating);
+
+        if (_groupFilter != null) {
+            instance.putSerializable("prefGroupFilter", new HashSet<>(_groupFilter));
+        }
     }
 
     @Override
@@ -327,6 +482,76 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
 
         assignIconIntent.putExtra("entries", assignIconEntriesIds);
         assignIconsResultLauncher.launch(assignIconIntent);
+    }
+
+    private void startAssignGroupsDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_select_group, null);
+        TextInputLayout groupSelectionLayout = view.findViewById(R.id.group_selection_layout);
+        AutoCompleteTextView groupsSelection = view.findViewById(R.id.group_selection_dropdown);
+        TextInputLayout newGroupLayout = view.findViewById(R.id.text_group_name_layout);
+        TextInputEditText newGroupText = view.findViewById(R.id.text_group_name);
+
+        Collection<VaultGroup> groups = _vaultManager.getVault().getUsedGroups();
+        List<VaultGroupModel> groupModels = new ArrayList<>();
+        groupModels.add(new VaultGroupModel(this, GroupPlaceholderType.NEW_GROUP));
+        groupModels.addAll(groups.stream().map(VaultGroupModel::new).collect(Collectors.toList()));
+        DropdownHelper.fillDropdown(this, groupsSelection, groupModels);
+
+        AtomicReference<VaultGroupModel> groupModelRef = new AtomicReference<>();
+        groupsSelection.setOnItemClickListener((parent, view1, position, id) -> {
+            VaultGroupModel groupModel = (VaultGroupModel) parent.getItemAtPosition(position);
+            groupModelRef.set(groupModel);
+
+            if (groupModel.isPlaceholder()) {
+                newGroupLayout.setVisibility(View.VISIBLE);
+                newGroupText.requestFocus();
+            } else {
+                newGroupLayout.setVisibility(View.GONE);
+            }
+
+            groupSelectionLayout.setError(null);
+        });
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.assign_groups)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+
+        dialog.setOnShowListener(d -> {
+            Button btnPos = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            btnPos.setOnClickListener(v -> {
+                VaultGroupModel groupModel = groupModelRef.get();
+                if (groupModel == null) {
+                    groupSelectionLayout.setError(getString(R.string.error_required_field));
+                    return;
+                }
+
+                if (groupModel.isPlaceholder()) {
+                    String newGroupName = newGroupText.getText().toString().trim();
+                    if (newGroupName.isEmpty()) {
+                        newGroupLayout.setError(getString(R.string.error_required_field));
+                        return;
+                    }
+
+                    VaultGroup group = new VaultGroup(newGroupName);
+                    _vaultManager.getVault().addGroup(group);
+                    groupModel = new VaultGroupModel(group);
+                }
+
+                for (VaultEntry selectedEntry : _selectedEntries) {
+                    selectedEntry.addGroup(groupModel.getUUID());
+                }
+
+                dialog.dismiss();
+                saveAndBackupVault();
+                _actionMode.finish();
+                setGroups(_vaultManager.getVault().getUsedGroups());
+            });
+        });
+
+        Dialogs.showSecureDialog(dialog);
     }
 
     private void startIntroActivity() {
@@ -676,7 +901,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
             startAuthActivity(false);
         } else if (_loaded) {
             // update the list of groups in the entry list view so that the chip gets updated
-            _entryListView.setGroups(_vaultManager.getVault().getUsedGroups());
+            setGroups(_vaultManager.getVault().getUsedGroups());
 
             // update the usage counts in case they are edited outside of the EntryListView
             _entryListView.setUsageCounts(_prefs.getUsageCounts());
@@ -716,7 +941,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
 
         updateLockIcon();
         if (_loaded) {
-            _entryListView.setGroups(_vaultManager.getVault().getUsedGroups());
+            setGroups(_vaultManager.getVault().getUsedGroups());
             updateSortCategoryMenu();
         }
 
@@ -835,7 +1060,7 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
 
     private void loadEntries() {
         if (!_loaded) {
-            _entryListView.setGroups(_vaultManager.getVault().getUsedGroups());
+            setGroups(_vaultManager.getVault().getUsedGroups());
             _entryListView.setUsageCounts(_prefs.getUsageCounts());
             _entryListView.setLastUsedTimestamps(_prefs.getLastUsedTimestamps());
             _entryListView.addEntries(_vaultManager.getVault().getEntries());
@@ -927,6 +1152,19 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
         });
 
         Dialogs.showSecureDialog(dialog);
+    }
+
+    @Override
+    public void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        HashSet<UUID> filter = (HashSet<UUID>) savedInstanceState.getSerializable("prefGroupFilter");
+        if (filter != null) {
+            _prefGroupFilter = filter;
+        }
     }
 
     @Override
@@ -1183,6 +1421,8 @@ public class MainActivity extends AegisActivity implements EntryListView.Listene
             } else if (itemId == R.id.action_assign_icons) {
                 startAssignIconsActivity(_selectedEntries);
                 mode.finish();
+            } else if (itemId == R.id.action_assign_groups) {
+                startAssignGroupsDialog();
             } else {
                 return false;
             }

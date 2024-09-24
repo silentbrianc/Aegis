@@ -46,7 +46,7 @@
     <string name="pref_account_name_position_title">显示账户名称</string>
     <string name="pref_shared_issuer_account_name_title">仅在必要时显示账户名</string>
     <string name="pref_shared_issuer_account_name_summary">仅在多项具有相同颁发者时显示账户名。隐藏其他账户名。</string>
-    <string name="pref_account_name_position_summary_override">此设置被瓷贴视图模式覆盖。账户名将始终显示在发行者下方。</string>
+    <string name="pref_account_name_position_summary_override">此设置被瓷贴视图模式覆盖。账户名将显示在发行者下方。</string>
     <string name="pref_import_file_title">从文件导入</string>
     <string name="pref_import_file_summary">从文件导入令牌</string>
     <string name="pref_android_backups_title">Android 云备份</string>
@@ -63,9 +63,11 @@
     <string name="pref_backups_trigger_title">触发备份</string>
     <string name="pref_backups_trigger_summary">手动触发备份</string>
     <string name="pref_backups_versions_title">要保留的版本数</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="other">保留 %1$d 个版本备份</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">备份版本无限量保留</string>
     <string name="pref_import_app_title">从应用导入</string>
     <string name="pref_import_app_summary">从其他应用导入令牌（需要 root 权限）</string>
     <string name="pref_export_title">导出</string>
@@ -100,6 +102,12 @@
     <string name="pref_encryption_summary">加密数据库，并在解锁时要求密码或生物识别验证。</string>
     <string name="pref_biometrics_title">生物识别解锁</string>
     <string name="pref_biometrics_summary">通过生物识别验证来解锁数据库</string>
+    <string name="pref_search_behavior_summary">搜索方式：%s</string>
+    <string name="pref_search_behavior_prompt">搜索下列任意字段</string>
+    <string name="pref_search_behavior_type_name">名称</string>
+    <string name="pref_search_behavior_type_issuer">颁发者</string>
+    <string name="pref_search_behavior_type_note">备注</string>
+    <string name="pref_search_behavior_type_groups">分组</string>
     <string name="pref_set_password_title">更改密码</string>
     <string name="pref_set_password_summary">设置解锁数据库所需的新密码</string>
     <string name="no_events_title">没有报告的事件</string>
@@ -119,6 +127,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">密码库解锁失败 (生物特征)</string>
     <string name="event_description_vault_unlock_failed_biometrics">尝试用生物特征解锁保险库失败</string>
     <string name="event_unknown">未知事件类型</string>
+    <string name="audit_log_entry_deleted">(已删除)</string>
     <string name="today_at_time">今天 %1$s</string>
     <string name="day_of_week_at_time">%2$s 的 %1$s</string>
     <string name="export_encrypted">加密数据库</string>
@@ -203,7 +212,6 @@
     <string name="reading_file">正在读取文件</string>
     <string name="requesting_root_access">正在请求 root 权限</string>
     <string name="analyzing_qr">正在分析二维码</string>
-    <string name="analyzing_qr_multiple">正在分析二维码 %d/%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="other">添加了 %d 个新条目到保险库</item>
     </plurals>
@@ -287,12 +295,12 @@
     <string name="partial_google_auth_import">检测到不完整的 Google 身份验证器导出</string>
     <string name="partial_google_auth_import_warning">您的导入缺少一些  QR 码。 找不到下列代码：\n\n<b>%s</b>\n\n您仍可以继续导入已有部分，但建议您重试所有 QR 码，以避免出现丢失令牌的风险。</string>
     <string name="missing_qr_code_descriptor">• QR 码 %d</string>
-    <string name="import_partial_export_anyway">继续导入 %d 个令牌</string>
     <string name="import_google_auth_failure">导入 Google 身份验证器的导出文件失败</string>
     <string name="unrelated_google_auth_batches_error">导出文件包含多个批次的内容。请一次只导入一个批次。</string>
     <string name="no_tokens_can_be_imported">没有可导入的令牌</string>
     <string name="unlocking_vault">解锁数据库</string>
     <string name="rename_group">重命名组</string>
+    <string name="no_group_selection">不在任何组中的条目会出现在“无分组”中。</string>
     <string name="remove_group">删除分组</string>
     <string name="remove_group_description">您确定要删除这个分组吗？此分组内的条目将自动移动到“无分组”。</string>
     <string name="remove_unused_groups">删除未使用的组</string>
@@ -329,6 +337,7 @@
     <string name="pref_minimize_on_copy_title">复制时最小化</string>
     <string name="pref_minimize_on_copy_summary">复制令牌后最小化应用</string>
     <string name="pref_copy_behavior_title">复制令牌到剪贴板</string>
+    <string name="pref_search_behavior_title">搜索行为</string>
     <string name="pref_pause_entry_title">轻按冻结令牌</string>
     <string name="pref_pause_entry_summary">通过轻按令牌来暂停它们的自动刷新。 只要被聚焦，令牌就不会更新。 需要启用“轻按突出显示令牌”或“轻按显示”。</string>
     <string name="pin_keyboard_description">请输入您的密码以启用 PIN 键盘。请注意，只有当您的密码仅由数字构成时才能使用</string>
@@ -353,7 +362,6 @@
     <string name="unable_to_process_deeplink">无法处理深层链接</string>
     <string name="unable_to_read_qrcode_file">无法从文件读取和处理二维码: %s。</string>
     <string name="unable_to_process_shared_text">无法将共享文本作为 OTP 进行处理</string>
-    <string name="unable_to_read_qrcode_files">无法读取和处理一些二维码。仅导入 %d/%d 条目。</string>
     <string name="unable_to_generate_qrcode">无法生成二维码</string>
     <string name="select_picture">选择图片</string>
     <string name="select_icon">选择图标</string>
@@ -384,14 +392,7 @@
     <string name="time_sync_warning_message">Aegis 依靠系统时间来同步生成正确的验证码。仅几秒钟的偏差可能会导致验证码错误。您的设备似乎未配置为自动同步时间。您现在要设置自动同步时间吗？</string>
     <string name="time_sync_warning_disable">不要再次提醒。我知道我在做什么。</string>
     <string name="google_qr_export_unrelated">找到不相关的二维码。请尝试重新扫描。</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="other">已扫描 %d/%d 二维码</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">预期二维码 #%d，已扫描 #%d</string>
     <string name="backup_error_bar_message"><b>数据库最近备份失败</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">因发生错误，上次使用 %s 备份密码库的尝试失败。尝试于 %s。请检查您的备份设置以确保备份成功完成。    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        上次使用 %s 备份密码库失败，Aegis 缺少写入备份目标的权限。尝试于 %s。错误可能因为您最近移动或重命名了备份目标，或者您最近从一个备份中还原了 Aegis ，请重新配置备份目标。
-    </string>
     <string name="backup_system_builtin">Aegis 内置的自动备份</string>
     <string name="backup_system_android">Android 的云备份系统</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        最新备份已过时 (%s)

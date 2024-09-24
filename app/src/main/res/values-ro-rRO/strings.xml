@@ -46,7 +46,7 @@
     <string name="pref_account_name_position_title">Arată numele contului</string>
     <string name="pref_shared_issuer_account_name_title">Arată numele contului doar atunci când este necesar</string>
     <string name="pref_shared_issuer_account_name_summary">Arată numai numele de cont ce au același emitent. Alte nume de cont vor fi ascunse.</string>
-    <string name="pref_account_name_position_summary_override">Această setare este suprascrisă de modul vizualizare tiles. Numele contului va fi afișat întotdeauna sub emitent.</string>
+    <string name="pref_account_name_position_summary_override">Această setare este suprascrisă de modul vizualizare dale. Numele contului va fi afișat mai jos de emitent.</string>
     <string name="pref_import_file_title">Importă din fișier</string>
     <string name="pref_import_file_summary">Importă token-uri dintr-un fișier</string>
     <string name="pref_android_backups_title">Backup-uri Android în cloud</string>
@@ -63,11 +63,13 @@
     <string name="pref_backups_trigger_title">Declanșare copie de rezervă</string>
     <string name="pref_backups_trigger_summary">Declanșează manual o copie de rezervă</string>
     <string name="pref_backups_versions_title">Numărul de versiuni de păstrat</string>
+    <string name="pref_backups_versions_infinite">\u221E</string>
     <plurals name="pref_backups_versions_summary">
         <item quantity="one">Păstraţi %1$d versiune a copiei de rezervă</item>
         <item quantity="few">Păstraţi %1$d versiune a copiei de rezervă</item>
         <item quantity="other">Păstraţi %1$d de versiuni ale copiei de rezervă</item>
     </plurals>
+    <string name="pref_backups_versions_infinite_summary">Păstrează un număr infinit de versiuni ale copiei de rezervă</string>
     <string name="pref_import_app_title">Importă din aplicație</string>
     <string name="pref_import_app_summary">Importă tokeni dintr-o aplicație (necesită acces root)</string>
     <string name="pref_export_title">Exportă</string>
@@ -123,6 +125,7 @@
     <string name="event_title_vault_unlock_failed_biometrics">Deblocarea seifului a eșuat (biometrie)</string>
     <string name="event_description_vault_unlock_failed_biometrics">Încercarea de a debloca seiful cu datele biometrice a eșuat</string>
     <string name="event_unknown">Tipul evenimentului este necunoscut</string>
+    <string name="audit_log_entry_deleted">(șters)</string>
     <string name="today_at_time">Astăzi, la %1$s</string>
     <string name="day_of_week_at_time">%1$s la %2$s</string>
     <string name="export_encrypted">Criptează seiful</string>
@@ -209,7 +212,6 @@
     <string name="reading_file">Citire fişier</string>
     <string name="requesting_root_access">Solicită acces root</string>
     <string name="analyzing_qr">Se analizează codul QR</string>
-    <string name="analyzing_qr_multiple">Se analizează codul QR %d%d (%s)</string>
     <plurals name="added_new_entries">
         <item quantity="one">Au fost adăugate %d de noi intrări în seif</item>
         <item quantity="few">Au fost adăugate %d noi intrări în seif</item>
@@ -303,12 +305,12 @@
     <string name="partial_google_auth_import">S-a detectat exportul incomplet a datelor din autentificatorul Google</string>
     <string name="partial_google_auth_import_warning">Unele coduri QR lipsesc din fișerul importat. Următoarele coduri nu au fost găsite:\n\n<b>%s</b>\n\nPuteţi continua importul acestui fișier parţial, dar vă recomandăm să încercaţi din nou cu toate codurile QR pentru a nu risca pierderea niciunui token.</string>
     <string name="missing_qr_code_descriptor">• codul QR %d</string>
-    <string name="import_partial_export_anyway">Importă jetoanele %d oricum</string>
     <string name="import_google_auth_failure">Importarea din Google Authenticator a eșuat</string>
     <string name="unrelated_google_auth_batches_error">Exportul conține informații pentru un calup neasociat. Încercați să importați câte un calup pe rând.</string>
     <string name="no_tokens_can_be_imported">Nu se pot importa token-uri drept rezultat</string>
     <string name="unlocking_vault">Deblocarea seifului</string>
     <string name="rename_group">Redenumește grupul</string>
+    <string name="no_group_selection">În cazul în care o intrare nu face parte din niciun grup, aceasta poate fi găsită în categoria „Niciun grup”.</string>
     <string name="remove_group">Elimină grupul</string>
     <string name="remove_group_description">Ești sigur că dorești să ștergi acest grup? Intrările din acest grup vor comuta automat la \'Niciun grup\'.</string>
     <string name="remove_unused_groups">Ștergeți grupurile neutilizate</string>
@@ -363,10 +365,14 @@
     <string name="tiles_mode_title">Tiles</string>
     <string name="unknown_issuer">Emitent necunoscut</string>
     <string name="unknown_account_name">Nume de cont necunoscut</string>
+    <plurals name="import_error_dialog">
+        <item quantity="one">Aegis nu a putut importa tokenul %d. Acest token va fi omis. Apasă pe \"detalii\" pentru a vedea mai multe informații despre erori.</item>
+        <item quantity="few">Aegis nu a putut importa tokenurile %d. Aceste tokenuri vor fi omise. Apasă pe \'detalii\' pentru a vedea mai multe informații despre erori.</item>
+        <item quantity="other">Aegis nu a putut importa tokenurile %d. Aceste tokenuri vor fi omise. Apasă pe \'detalii\' pentru a vedea mai multe informații despre erori.</item>
+    </plurals>
     <string name="unable_to_process_deeplink">Nu se poate procesa link-ul</string>
     <string name="unable_to_read_qrcode_file">Nu se poate citi și procesa codul QR din fișierul: %s.</string>
     <string name="unable_to_process_shared_text">Imposibil de procesat textul partajat ca un cod OTP</string>
-    <string name="unable_to_read_qrcode_files">Nu se pot citi şi procesa unele dintre codurile QR. Doar %d/%d intrări vor fi importate.</string>
     <string name="unable_to_generate_qrcode">Nu se poate genera codul QR</string>
     <string name="select_picture">Selectare imagine</string>
     <string name="select_icon">Selectare pictogramă</string>
@@ -397,16 +403,7 @@
     <string name="time_sync_warning_message">Aegis-ul se bazează pe un sistem de timp pentru a fi sincronizat pentru a genera codurile corecte. O abatere de doar câteva secunde ar putea duce la coduri incorecte. Se pare că dispozitivul tău nu este configurat pentru a sincroniza automat timpul. Dorești să faci acest lucru acum?</string>
     <string name="time_sync_warning_disable">Nu mă mai avertiza. Ştiu ce fac.</string>
     <string name="google_qr_export_unrelated">Cod QR negăsit găsit. Încearcă să repornești scanerul.</string>
-    <plurals name="google_qr_export_scanned">
-        <item quantity="one">Cod %d/%d QR scanat</item>
-        <item quantity="few">Coduri %d/%d QR scanate</item>
-        <item quantity="other">Coduri %d/%d QR scanate</item>
-    </plurals>
-    <string name="google_qr_export_unexpected">Se aștepta codul QR #%d, dar scanat #%d în schimb</string>
     <string name="backup_error_bar_message"><b>Copia de rezervă a seifului a eșuat recent</b></string>
-    <string name="backup_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">O încercare recentă de backup a seifului folosind %s a eșuat deoarece a apărut o eroare. S-a încercat crearea unei copii de siguranță la: %s. Vă rugăm să verificați setările copiilor de rezervă pentru a vă asigura că acestea pot fii create cu succes.    </string>
-    <string name="backup_permission_error_dialog_details" comment="The first parameter is the type of backup (e.g. built-in or Android backup). The second parameter is an elapsed time in the style of 'x seconds/minutes/days ago'.">        O încercare recentă de backup a seifului folosind %s a eșuat deoarece Aegis nu a avut permisiunea de a scrie în dosarul destinație. Sa încercat creearea unui backup la %s. Această eroare poate apărea dacă ați mutat/redenumit destinația copiei de rezervă sau dacă ați restaurat recent Aegis dintr-o copie de rezervă. Vă rugăm să reconfiguraţi destinaţia copiei de rezervă.
-    </string>
     <string name="backup_system_builtin">Copiile de siguranță încorporate în aplicație</string>
     <string name="backup_system_android">Sistemul de backup în cloud Android</string>
     <string name="backup_reminder_bar_message_with_latest" comment="The parameter is an elapsed time in the style of 'x seconds/minutes/days ago'">        Ultima copie de rezervă este învechită (%s)
@@ -480,6 +477,7 @@
     <string name="importer_help_authy">Furnizează o copie a <b>/data/data/com.authy.authy/shared_prefs/com.authy.storage.tokens.authenticator.xml</b>, localizată în directorul de stocare internă al Authy.</string>
     <string name="importer_help_andotp">Furnizați un fişier de export/copie de rezervă andOTP.</string>
     <string name="importer_help_bitwarden">Furnizează un fișier de backup din aplicația Bitwarden. Fișierele criptate nu sunt suportate.</string>
+    <string name="importer_help_battle_net_authenticator">Furnizează o copie a <b>/data/data/com.blizzard.messenger/shared_prefs/com.blizzard.messenger.authenticator_preferences.xml</b>, localizată în folderul din memoria internă al Battle.net Authenticator.</string>
     <string name="importer_help_duo">Furnizează o copie a <b>/data/data/com.duosecurity.duomobile/files/duokit/accounts.json</b>, localizată în dosarul din memoria internă al DUO.</string>
     <string name="importer_help_freeotp">Furnizează o copie a <b>/data/data/org.fedorahosted.freeotp/shared_prefs/tokens.xml</b>, localizată în dosarul din stocarea internă a FreeOTP (1.x).</string>
     <string name="importer_help_freeotp_plus">Furnizează un fișier de export FreeOTP+.</string>

@@ -248,7 +248,7 @@
 
     <style name="ThemeOverlay.Aegis.AlertDialog.Warning">
         <item name="android:alertDialogIcon">@drawable/ic_outline_warning_24</item>
-        <item name="materialAlertDialogTitleIconStyle">@style/Widget.Aegis.AlertDialog.Icon.Error</item>
+        <item name="materialAlertDialogTitleIconStyle">@style/Widget.Aegis.AlertDialog.Icon.Warning</item>
     </style>
 
     <style name="Widget.Aegis.AlertDialog.Icon.Error" parent="@style/MaterialAlertDialog.Material3.Title.Icon.CenterStacked">
@@ -262,5 +262,10 @@
     <style name="ShapeAppearanceOverlay.Aegis.ImageView.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Aegis.ImageView.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

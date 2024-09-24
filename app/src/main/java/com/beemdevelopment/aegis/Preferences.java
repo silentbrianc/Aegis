@@ -5,9 +5,9 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import com.beemdevelopment.aegis.util.JsonUtils;
 import com.beemdevelopment.aegis.util.TimeUtils;
@@ -33,12 +33,25 @@ public class Preferences {
     public static final int AUTO_LOCK_ON_BACK_BUTTON = 1 << 1;
     public static final int AUTO_LOCK_ON_MINIMIZE = 1 << 2;
     public static final int AUTO_LOCK_ON_DEVICE_LOCK = 1 << 3;
+
+    public static final int SEARCH_IN_ISSUER = 1 << 0;
+    public static final int SEARCH_IN_NAME = 1 << 1;
+    public static final int SEARCH_IN_NOTE = 1 << 2;
+    public static final int SEARCH_IN_GROUPS = 1 << 3;
+
     public static final int BACKUPS_VERSIONS_INFINITE = -1;
 
     public static final int[] AUTO_LOCK_SETTINGS = {
             AUTO_LOCK_ON_BACK_BUTTON,
             AUTO_LOCK_ON_MINIMIZE,
             AUTO_LOCK_ON_DEVICE_LOCK
+    };
+
+    public static final int[] SEARCH_BEHAVIOR_SETTINGS = {
+            SEARCH_IN_ISSUER,
+            SEARCH_IN_NAME,
+            SEARCH_IN_NOTE,
+            SEARCH_IN_GROUPS
     };
 
     private SharedPreferences _prefs;
@@ -140,6 +153,10 @@ public class Preferences {
         return _prefs.getBoolean("pref_show_icons", true);
     }
 
+    public boolean getShowExpirationState() {
+        return _prefs.getBoolean("pref_expiration_state", true);
+    }
+
     public CodeGrouping getCodeGroupSize() {
         String value = _prefs.getString("pref_code_group_size_string", "GROUPING_THREES");
 
@@ -161,6 +178,20 @@ public class Preferences {
         }
 
         return _prefs.getInt("pref_auto_lock_mask", def);
+    }
+
+    public int getSearchBehaviorMask() {
+        final int def = SEARCH_IN_ISSUER | SEARCH_IN_NAME;
+
+        return _prefs.getInt("pref_search_behavior_mask", def);
+    }
+
+    public boolean isSearchBehaviorTypeEnabled(int searchBehaviorType) {
+        return (getSearchBehaviorMask() & searchBehaviorType) == searchBehaviorType;
+    }
+
+    public void setSearchBehaviorMask(int searchBehavior) {
+        _prefs.edit().putInt("pref_search_behavior_mask", searchBehavior).apply();
     }
 
     public boolean isAutoLockEnabled() {
