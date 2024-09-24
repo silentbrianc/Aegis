@@ -191,6 +191,7 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
     implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
     implementation 'org.simpleflatmapper:sfm-csv:8.2.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
 
     androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:$hiltVersion"
     androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
